@@ -401,7 +401,6 @@ subprojects {
       "-language:postfixOps",
       "-language:implicitConversions",
       "-language:existentials",
-      "-Xlint:by-name-right-associative",
       "-Xlint:delayedinit-select",
       "-Xlint:doc-detached",
       "-Xlint:missing-interpolator",
@@ -412,14 +411,20 @@ subprojects {
       "-Xlint:poly-implicit-overload",
       "-Xlint:private-shadow",
       "-Xlint:stars-align",
-      "-Xlint:type-parameter-shadow",
-      "-Xlint:unsound-match"
+      "-Xlint:type-parameter-shadow"
     ]
 
     if (versions.baseScala != '2.11') {
       scalaCompileOptions.additionalParameters += [
         "-Xlint:constant",
         "-Xlint:unused"
+      ]
+    }
+
+    if (versions.baseScala != '2.13') {
+      scalaCompileOptions.additionalParameters += [
+        "-Xlint:by-name-right-associative",
+        "-Xlint:unsound-match"
       ]
     }
 
