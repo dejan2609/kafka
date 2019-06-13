@@ -430,6 +430,11 @@ subprojects {
       ]
     }
 
+    println 'THIRD CHECK'
+    println "Scala version value is ${versions.scala}"
+    println "Scala base version value is ${versions.baseScala}"
+    println '#########################################################'
+
     configure(scalaCompileOptions.forkOptions) {
       memoryMaximumSize = '1g'
       jvmArgs = ['-Xss2m']
