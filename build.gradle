@@ -423,7 +423,7 @@ subprojects {
     
 // these options are valid for Scala versions < 2.13 only
 // Scala 2.13 removes them, see https://github.com/scala/scala/pull/6502 and https://github.com/scala/scala/pull/5969 
-    if ((versions.baseScala = '2.11') || (versions.baseScala = '2.12')) {
+    if (versions.baseScala != '2.13') {
       scalaCompileOptions.additionalParameters += [
         "-Xlint:by-name-right-associative",
         "-Xlint:unsound-match"
