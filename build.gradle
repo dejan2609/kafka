@@ -414,12 +414,20 @@ subprojects {
       "-Xlint:type-parameter-shadow"
     ]
 
+    println 'FIRST CHECK'
+    println "Building project 'core' with Scala version ${versions.scala}"
+    println '#########################################################'
+
     if (versions.baseScala != '2.11') {
       scalaCompileOptions.additionalParameters += [
         "-Xlint:constant",
         "-Xlint:unused"
       ]
     }
+
+    println 'SECOND CHECK'
+    println "Building project 'core' with Scala version ${versions.scala}"
+    println '#########################################################'
     
 // these options are valid for Scala versions < 2.13 only
 // Scala 2.13 removes them, see https://github.com/scala/scala/pull/6502 and https://github.com/scala/scala/pull/5969 
