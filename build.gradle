@@ -414,12 +414,23 @@ subprojects {
       "-Xlint:type-parameter-shadow"
     ]
 
+    println 'FIRST CHECK'
+    println "Scala version value is ${versions.scala}"
+    println "Scala base version value is ${versions.baseScala}"
+    println '#########################################################'
+
+
     if (versions.baseScala != '2.11') {
       scalaCompileOptions.additionalParameters += [
         "-Xlint:constant",
         "-Xlint:unused"
       ]
     }
+
+    println 'SECOND CHECK'
+    println "Scala version value is ${versions.scala}"
+    println "Scala base version value is ${versions.baseScala}"
+    println '#########################################################'
     
 // these options are valid for Scala versions < 2.13 only
 // Scala 2.13 removes them, see https://github.com/scala/scala/pull/6502 and https://github.com/scala/scala/pull/5969 
@@ -429,6 +440,11 @@ subprojects {
         "-Xlint:unsound-match"
       ]
     }
+
+    println 'THIRD CHECK'
+    println "Scala version value is ${versions.scala}"
+    println "Scala base version value is ${versions.baseScala}"
+    println '#########################################################'
 
     configure(scalaCompileOptions.forkOptions) {
       memoryMaximumSize = '1g'
