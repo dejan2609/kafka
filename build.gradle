@@ -416,6 +416,11 @@ subprojects {
       "-Xlint:unsound-match"
     ]
 
+    println 'FIRST CHECK'
+    println "Scala version value is ${versions.scala}"
+    println "Scala base version value is ${versions.baseScala}"
+    println '#########################################################'
+
     if (versions.baseScala != '2.11') {
       scalaCompileOptions.additionalParameters += [
         "-Xlint:constant",
