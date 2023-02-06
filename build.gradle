@@ -30,7 +30,7 @@ buildscript {
 }
 
 plugins {
-  id 'com.diffplug.spotless' version '6.13.0'
+  id 'com.diffplug.spotless' version '6.13.0' // do not change spotless plugin version (wait for Kafka 4.0)
   id 'com.github.ben-manes.versions' version '0.44.0'
   id 'idea'
   id 'java-library'
@@ -44,7 +44,7 @@ plugins {
   id "io.swagger.core.v3.swagger-gradle-plugin" version "2.2.0"
 }
 
-spotless {
+spotless { // do not change spotless plugin configuration (wait for Kafka 4.0)
   scala {
     target 'streams/**/*.scala'
     scalafmt("$versions.scalafmt").configFile('checkstyle/.scalafmt.conf').scalaMajorVersion(versions.baseScala)
@@ -2111,7 +2111,6 @@ project(':streams:streams-scala') {
     dependsOn 'copyDependantLibs'
   }
 
-  test.dependsOn(':spotlessScalaCheck')
 }
 
 project(':streams:test-utils') {
