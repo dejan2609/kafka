@@ -666,7 +666,6 @@ subprojects {
 
     if (versions.baseScala != '2.12') {
       scalaCompileOptions.additionalParameters += ["-opt-warnings", "-Xlint:strict-unsealed-patmat"]
-      scalaCompileOptions.additionalParameters += ["-Wconf:msg=Use -release instead to compile against the correct platform API:silent"]
       // Scala 2.13.2 introduces compiler warnings suppression, which is a pre-requisite for -Xfatal-warnings
       scalaCompileOptions.additionalParameters += ["-Xfatal-warnings"]
     }
