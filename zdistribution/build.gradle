@@ -47,6 +47,11 @@ distributions {
     main {
         distributionBaseName = 'someName'
         contents {
+            from(project.file("$rootDir/bin")) { into "bin/" }
+            from(project.file("$rootDir/config")) { into "config/" }
+            from(project.file("$rootDir/licenses")) { into "licenses/" }
+            from "$rootDir/LICENSE-binary" rename {String filename -> filename.replace("-binary", "")}
+            from "$rootDir/NOTICE-binary" rename {String filename -> filename.replace("-binary", "")}
             from(configurations.wholeProjectDist) { into("libs/") }
             //from(project(':tools').jar) { into("libs/") } //this is producing a duplicate
            // from(project.siteDocsTar) { into("site-docs/") }
