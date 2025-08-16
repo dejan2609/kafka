@@ -7,6 +7,20 @@ repositories {
     mavenCentral()
 }
 
+// https://discuss.gradle.org/t/gradle-7-x-and-duplicatesstrategy/41045/2
+// https://stackoverflow.com/questions/25752078/multiproject-gradle-duplicate-dependencies-in-distribution-zip
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Sync.html#org.gradle.api.tasks.Sync:duplicatesStrategy
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html#org.gradle.api.tasks.AbstractCopyTask:duplicatesStrategy
+// https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html#class-description
+
+plugins.withType(DistributionPlugin) {
+    distTar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        //compression = Compression.GZIP
+        //extension = 'tar.gz'
+    }
+}
+
 configurations {
     wholeProjectDist
 }
@@ -22,7 +36,7 @@ dependencies {
     //wholeProjectDist project(':tools').jar
     //wholeProjectDist project(':tools').configurations.runtimeClasspath
     wholeProjectDist project(path: ':tools', configuration: 'archives')
-    //wholeProjectDist project(':trogdor').jar
+    //wholeProjectDist project(':tools').jar
     //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
     //wholeProjectDist project(':shell').jar
     //wholeProjectDist project(':shell').configurations.runtimeClasspath
@@ -34,6 +48,8 @@ distributions {
         distributionBaseName = 'someName'
         contents {
             from(configurations.wholeProjectDist) { into("libs/") }
+            //from(project(':tools').jar) { into("libs/") } //this is producing a duplicate
+           // from(project.siteDocsTar) { into("site-docs/") }
         }
     }
 }
