@@ -14,9 +14,28 @@ configurations {
 dependencies {
     //wholeProjectDist project(path: ':3pp-a-module', configuration: 'archives')
     //wholeProjectDist project(path: ':3pp-b-module', configuration: 'archives')
-    wholeProjectDist project(':application')
+   // wholeProjectDist project(':application')
     //wholeProjectDist project(':list')
-    wholeProjectDist project(path: ':list', configuration: 'archives')
-    wholeProjectDist project(':utilities')
-    wholeProjectDist project(':producer')
+    //wholeProjectDist project(path: ':list', configuration: 'archives')
+    //wholeProjectDist project(':utilities')
+    //wholeProjectDist project(':producer')
+    //wholeProjectDist project(':tools').jar
+    //wholeProjectDist project(':tools').configurations.runtimeClasspath
+    wholeProjectDist project(path: ':tools', configuration: 'archives')
+    //wholeProjectDist project(':trogdor').jar
+    //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
+    //wholeProjectDist project(':shell').jar
+    //wholeProjectDist project(':shell').configurations.runtimeClasspath
+    //wholeProjectDist project(':connect:api').jar
 }
+
+distributions {
+    main {
+        distributionBaseName = 'someName'
+        contents {
+            from(configurations.wholeProjectDist) { into("libs/") }
+        }
+    }
+}
+
+
