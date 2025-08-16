@@ -15,7 +15,7 @@ repositories {
 
 plugins.withType(DistributionPlugin) {
     distTar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        //duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         //compression = Compression.GZIP
         //extension = 'tar.gz'
     }
@@ -36,6 +36,7 @@ dependencies {
     //wholeProjectDist project(':tools').jar
     //wholeProjectDist project(':tools').configurations.runtimeClasspath
     wholeProjectDist project(path: ':tools', configuration: 'archives')
+    wholeProjectDist project(path: ':tools', configuration: 'runtimeClasspath')
     //wholeProjectDist project(':tools').jar
     //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
     //wholeProjectDist project(':shell').jar
@@ -59,4 +60,5 @@ distributions {
     }
 }
 
+distTar.dependsOn(project(':core').siteDocsTar)
 
