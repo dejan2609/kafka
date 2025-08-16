@@ -3901,3 +3901,95 @@ task aggregatedJavadoc(type: Javadoc, dependsOn: compileJava) {
   includes = projectsWithJavadoc.collectMany { it.javadoc.getIncludes() }
   excludes = projectsWithJavadoc.collectMany { it.javadoc.getExcludes() }
 }
+
+
+
+project('zdistribution') {
+    apply plugin: 'distribution'
+
+//    group = 'org.apache.kafka'
+//    version = '4.2.0-SNAPSHOT'
+//
+//    repositories {
+//        mavenCentral()
+//    }
+
+// https://discuss.gradle.org/t/gradle-7-x-and-duplicatesstrategy/41045/2
+// https://stackoverflow.com/questions/25752078/multiproject-gradle-duplicate-dependencies-in-distribution-zip
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Sync.html#org.gradle.api.tasks.Sync:duplicatesStrategy
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html#org.gradle.api.tasks.AbstractCopyTask:duplicatesStrategy
+// https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html#class-description
+
+    plugins.withType(DistributionPlugin) {
+        distTar {
+            //duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            //compression = Compression.GZIP
+            //extension = 'tar.gz'
+        }
+    }
+
+
+    task justShowFile {
+        //println "${rootProject.project('tools').buildDir}/"
+        //println("${rootProject.project('tools').buildDir}/")
+        //println("${versions.scala}")
+        println project.layout.buildDirectory.get().asFile.path
+        println project(':tools').layout.buildDirectory.get().asFile.path
+
+    }
+
+
+
+
+
+
+    configurations {
+        wholeProjectDist
+    }
+
+    dependencies {
+        //wholeProjectDist project(path: ':3pp-a-module', configuration: 'archives')
+        //wholeProjectDist project(path: ':3pp-b-module', configuration: 'archives')
+        // wholeProjectDist project(':application')
+        //wholeProjectDist project(':list')
+        //wholeProjectDist project(path: ':list', configuration: 'archives')
+        //wholeProjectDist project(':utilities')
+        //wholeProjectDist project(':producer')
+        //wholeProjectDist project(':tools').jar
+        //wholeProjectDist project(':tools').configurations.runtimeClasspath
+        wholeProjectDist project(path: ':tools', configuration: 'archives')
+       // wholeProjectDist project(path: ':streams', configuration: 'runtimeClasspath')
+        //wholeProjectDist project(':tools').jar
+        //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
+        //wholeProjectDist project(':shell').jar
+        //wholeProjectDist project(':shell').configurations.runtimeClasspath
+        //wholeProjectDist project(':connect:api').jar
+    }
+
+    distributions {
+        main {
+            distributionBaseName = 'someName'
+            contents {
+                from(project.file("$rootDir/bin")) { into "bin/" }
+                from(project.file("$rootDir/config")) { into "config/" }
+                from(project.file("$rootDir/licenses")) { into "licenses/" }
+                from "$rootDir/LICENSE-binary" rename {String filename -> filename.replace("-binary", "")}
+                from "$rootDir/NOTICE-binary" rename {String filename -> filename.replace("-binary", "")}
+                //from "${project(':tools').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}" { into("libs/") }
+                from(configurations.wholeProjectDist) { into("libs/") }
+                //from(project(':tools').jar) { into("libs/") } //this is producing a duplicate
+                // from(project.siteDocsTar) { into("site-docs/") }
+
+                //https://stackoverflow.com/questions/63858392/gradle-copy-submodules-output-into-other-submodule-resources
+                // into "${layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}"
+                //:tools/build/dependant-libs-${versions.scala}"
+                // https://discuss.gradle.org/t/defining-subproject-dependencies-for-particular-artifacts/47241/27
+            }
+        }
+    }
+
+    distTar.dependsOn(project(':core').siteDocsTar)
+
+
+
+}

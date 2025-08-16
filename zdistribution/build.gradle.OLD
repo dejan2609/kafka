@@ -28,15 +28,15 @@ configurations {
 dependencies {
     //wholeProjectDist project(path: ':3pp-a-module', configuration: 'archives')
     //wholeProjectDist project(path: ':3pp-b-module', configuration: 'archives')
-   // wholeProjectDist project(':application')
+    // wholeProjectDist project(':application')
     //wholeProjectDist project(':list')
     //wholeProjectDist project(path: ':list', configuration: 'archives')
     //wholeProjectDist project(':utilities')
     //wholeProjectDist project(':producer')
     //wholeProjectDist project(':tools').jar
     //wholeProjectDist project(':tools').configurations.runtimeClasspath
-    wholeProjectDist project(path: ':tools', configuration: 'archives')
-    wholeProjectDist project(path: ':tools', configuration: 'runtimeClasspath')
+    //wholeProjectDist project(path: ':tools', configuration: 'archives')
+    wholeProjectDist project(path: ':streams', configuration: 'runtimeClasspath')
     //wholeProjectDist project(':tools').jar
     //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
     //wholeProjectDist project(':shell').jar
@@ -55,7 +55,7 @@ distributions {
             from "$rootDir/NOTICE-binary" rename {String filename -> filename.replace("-binary", "")}
             from(configurations.wholeProjectDist) { into("libs/") }
             //from(project(':tools').jar) { into("libs/") } //this is producing a duplicate
-           // from(project.siteDocsTar) { into("site-docs/") }
+            // from(project.siteDocsTar) { into("site-docs/") }
         }
     }
 }
