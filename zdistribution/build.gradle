@@ -1,0 +1,22 @@
+apply plugin: 'distribution'
+
+group = 'org.apache.kafka'
+version = '4.2.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    wholeProjectDist
+}
+
+dependencies {
+    //wholeProjectDist project(path: ':3pp-a-module', configuration: 'archives')
+    //wholeProjectDist project(path: ':3pp-b-module', configuration: 'archives')
+    wholeProjectDist project(':application')
+    //wholeProjectDist project(':list')
+    wholeProjectDist project(path: ':list', configuration: 'archives')
+    wholeProjectDist project(':utilities')
+    wholeProjectDist project(':producer')
+}
