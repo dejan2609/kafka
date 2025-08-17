@@ -3922,7 +3922,7 @@ project('zdistribution') {
 
     plugins.withType(DistributionPlugin) {
         distTar {
-            //duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             //compression = Compression.GZIP
             //extension = 'tar.gz'
         }
@@ -3960,7 +3960,7 @@ project('zdistribution') {
         //wholeProjectDist project(':tools').jar
         //wholeProjectDist project(':tools').configurations.runtimeClasspath
         wholeProjectDist project(path: ':tools', configuration: 'archives')
-       // wholeProjectDist project(path: ':streams', configuration: 'runtimeClasspath')
+        wholeProjectDist project(path: ':core', configuration: 'releaseOnly')
         //wholeProjectDist project(':tools').jar
         //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
         //wholeProjectDist project(':shell').jar
@@ -3981,6 +3981,11 @@ project('zdistribution') {
                 from(configurations.wholeProjectDist) { into("libs/") }
                 //from(project(':tools').jar) { into("libs/") } //this is producing a duplicate
                 // from(project.siteDocsTar) { into("site-docs/") }
+
+
+
+                from(project(':core').siteDocsTar) { into("site-docs/") }
+
 
                 //https://stackoverflow.com/questions/63858392/gradle-copy-submodules-output-into-other-submodule-resources
                 // into "${layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}"
