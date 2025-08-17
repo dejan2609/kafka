@@ -3955,9 +3955,24 @@ project('zdistribution') {
 //        > To determine which configurations are available in the target project :core, run :core:outgoingVariants.
 //        > Review the variant matching algorithm at https://docs.gradle.org/9.0.0/userguide/variant_attributes.html#sec:abm_algorithm.
 
+//
+//        Incubating] Problems report is available at: file:///home/dejan/kafka/build/reports/problems/problems-report.html
+//
+//        FAILURE: Build failed with an exception.
+//
+//        * What went wrong:
+//        Could not determine the dependencies of task ':zdistribution:distTar'.
+//        > Could not resolve all dependencies for configuration ':zdistribution:wholeProjectDist'.
+//        > Could not resolve project :core.
+//                Required by:
+//        project ':zdistribution'
+//                > A dependency was declared on configuration 'runtimeClasspath' of 'project :core' but no variant with that configuration name exists.
+
+
+
         wholeProjectDist project(path: ':tools', configuration: 'archives')
         wholeProjectDist project(path: ':core', configuration: 'releaseOnly')
-        wholeProjectDist project(path: ':core', configuration: 'runtimeClasspath')
+        //wholeProjectDist project(path: ':core', configuration: 'runtimeClasspath')
 
         //wholeProjectDist project(':tools').jar
         //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
