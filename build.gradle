@@ -3986,6 +3986,8 @@ project('zdistribution') {
                 // into "${layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}"
                 //:tools/build/dependant-libs-${versions.scala}"
                 // https://discuss.gradle.org/t/defining-subproject-dependencies-for-particular-artifacts/47241/27
+
+                from("${project(':tools').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
             }
         }
     }
