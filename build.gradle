@@ -3964,7 +3964,21 @@ project('zdistribution') {
 
                 from("${project(':core').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
                 from("${project(':tools').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
-
+                from("${project(':trogdor').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':shell').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:api').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:runtime').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:transforms').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:json').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:file').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:basic-auth-extension').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:mirror').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:mirror-client').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':streams').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':streams:streams-scala').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':streams:test-utils').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':streams:examples').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':tools:tools-api').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
             }
         }
     }
