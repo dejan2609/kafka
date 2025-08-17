@@ -3928,39 +3928,37 @@ project('zdistribution') {
         }
     }
 
-
     task justShowFile {
         //println "${rootProject.project('tools').buildDir}/"
         //println("${rootProject.project('tools').buildDir}/")
         //println("${versions.scala}")
         println project.layout.buildDirectory.get().asFile.path
         println project(':tools').layout.buildDirectory.get().asFile.path
-
         print "${project(':core').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}"
 
     }
-
-
-
-
-
 
     configurations {
         wholeProjectDist
     }
 
     dependencies {
-        //wholeProjectDist project(path: ':3pp-a-module', configuration: 'archives')
-        //wholeProjectDist project(path: ':3pp-b-module', configuration: 'archives')
-        // wholeProjectDist project(':application')
-        //wholeProjectDist project(':list')
-        //wholeProjectDist project(path: ':list', configuration: 'archives')
-        //wholeProjectDist project(':utilities')
-        //wholeProjectDist project(':producer')
-        //wholeProjectDist project(':tools').jar
-        //wholeProjectDist project(':tools').configurations.runtimeClasspath
+//        * What went wrong:
+//        Could not determine the dependencies of task ':zdistribution:distTar'.
+//        > Could not resolve all dependencies for configuration ':zdistribution:wholeProjectDist'.
+//        > Could not resolve project :core.
+//                Required by:
+//        project ':zdistribution'
+//                > A dependency was declared on configuration 'runtimeClasspath' of 'project :core' but no variant with that configuration name exists.
+//
+//        * Try:
+//        > To determine which configurations are available in the target project :core, run :core:outgoingVariants.
+//        > Review the variant matching algorithm at https://docs.gradle.org/9.0.0/userguide/variant_attributes.html#sec:abm_algorithm.
+
         wholeProjectDist project(path: ':tools', configuration: 'archives')
         wholeProjectDist project(path: ':core', configuration: 'releaseOnly')
+        wholeProjectDist project(path: ':core', configuration: 'runtimeClasspath')
+
         //wholeProjectDist project(':tools').jar
         //wholeProjectDist project(':trogdor').configurations.runtimeClasspath
         //wholeProjectDist project(':shell').jar
