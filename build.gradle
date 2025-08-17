@@ -3936,6 +3936,8 @@ project('zdistribution') {
         println project.layout.buildDirectory.get().asFile.path
         println project(':tools').layout.buildDirectory.get().asFile.path
 
+        print "${project(':core').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}"
+
     }
 
 
