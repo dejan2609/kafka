@@ -3909,7 +3909,7 @@ project('zdistribution') {
     plugins.withType(DistributionPlugin) {
         distTar {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            //compression = Compression.GZIP
+            compression = Compression.GZIP
             //extension = 'tar.gz'
         }
     }
