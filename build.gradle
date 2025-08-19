@@ -3952,7 +3952,7 @@ project('zdistribution') {
 
     distributions {
         main {
-            distributionBaseName = 'someName' // "kafka_${versions.baseScala}-${archiveVersion.get()}"
+            distributionBaseName = distributionBaseName = "kafka_${versions.baseScala}-${project.version}"
             contents {
                 from(project.file("$rootDir/bin")) { into "bin/" }
                 from(project.file("$rootDir/config")) { into "config/" }
