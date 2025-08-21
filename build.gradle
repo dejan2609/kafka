@@ -327,7 +327,8 @@ subprojects {
   def shouldPublishWithShadow = (['clients'].contains(project.name))
 
 
-  def shouldModuleResolveRuntimeClasspath = (['streams-scala'].contains(project.name))
+  def shouldModuleResolveRuntimeClasspath = (['core', 'tools', 'trogdor', 'shell', 'api', 'runtime', 'transforms', 'json', 'file', 'basic-auth-extension', 'mirror', 'mirror-client',
+                                              'streams', 'streams-scala', 'test-utils', 'examples', 'tools-api'].contains(project.name))
 
   if (shouldModuleResolveRuntimeClasspath) {
     configurations.create('publishedRuntimeClasspath') {
