@@ -4002,7 +4002,7 @@ project('zdistribution') {
                 // from("${project(':tools:tools-api').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
             }
         }
-        custom {
+        siteDoc {
             distributionBaseName = "kafka_${versions.baseScala}-${project.version}-site-doc"
             contents {
                 from(project(':core').siteDocsTar) { into("site-docs/") }
