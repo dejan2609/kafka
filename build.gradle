@@ -3949,8 +3949,9 @@ project('zdistribution') {
     }
 
     dependencies {
-        // wholeProjectDist project(path: ':core', configuration: 'releaseOnly')
-        // wholeProjectDist project(path: ':core', configuration: 'archives')
+        wholeProjectDist project(path: ':core', configuration: 'releaseOnly')
+        wholeProjectDist project(path: ':core', configuration: 'archives')
+        wholeProjectDist project(path: ':core', configuration: 'runtimeClasspath') //publishedRuntimeClasspath
         // wholeProjectDist project(path: ':tools', configuration: 'archives')
         // wholeProjectDist project(path: ':trogdor', configuration: 'archives')
         // wholeProjectDist project(path: ':shell', configuration: 'archives')
@@ -3967,7 +3968,7 @@ project('zdistribution') {
         // wholeProjectDist project(path: ':streams:test-utils', configuration: 'archives')
         // wholeProjectDist project(path: ':streams:examples', configuration: 'archives')
         //wholeProjectDist project(path: ':tools:tools-api', configuration: 'archives')
-        wholeProjectDist project(path: ':streams:streams-scala', configuration: 'publishedRuntimeClasspath')
+        //wholeProjectDist project(path: ':streams:streams-scala', configuration: 'publishedRuntimeClasspath')
 
         
     }
