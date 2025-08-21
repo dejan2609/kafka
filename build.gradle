@@ -326,6 +326,19 @@ subprojects {
   def shouldPublish = !project.name.equals('jmh-benchmarks')
   def shouldPublishWithShadow = (['clients'].contains(project.name))
 
+
+  def shouldModuleResolveRuntimeClasspath = (['tools:tools-api'].contains(project.name))
+  if (shouldModuleResolveRuntimeClasspath) {
+    configurations.create('publishedRuntimeClasspath') {
+        //resolutionStrategy.useGlobalDependencySubstitutionRules = true
+        extendsFrom(configurations.runtimeClasspath)
+        //canBeConsumed = false
+        canBeResolved = true
+        //canBeDeclared = false
+        //attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+      }
+  }
+
   if (shouldPublish) {
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
@@ -2385,15 +2398,6 @@ project(':tools:tools-api') {
     testImplementation testLog4j2Libs
     testRuntimeOnly runtimeTestLibs
   }
-
-    configurations.create('publishedRuntimeClasspath') {
-        //resolutionStrategy.useGlobalDependencySubstitutionRules = true
-        extendsFrom(configurations.runtimeClasspath)
-        //canBeConsumed = false
-        canBeResolved = true
-        //canBeDeclared = false
-        //attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
-    }
 
   task createVersionFile() {
     def receiptFile = file("${layout.buildDirectory.get().asFile.path}/kafka/$buildVersionFileName")
