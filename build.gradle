@@ -327,19 +327,6 @@ subprojects {
   def shouldPublishWithShadow = (['clients'].contains(project.name))
 
 
-  def shouldModuleResolveRuntimeClasspath = (['core', 'tools', 'trogdor', 'shell', 'api', 'runtime', 'transforms', 'json', 'file', 'basic-auth-extension', 'mirror', 'mirror-client',
-                                              'streams', 'streams-scala', 'test-utils', 'examples', 'tools-api'].contains(project.name))
-
-  if (shouldModuleResolveRuntimeClasspath) {
-    configurations.create('publishedRuntimeClasspath') {
-        //resolutionStrategy.useGlobalDependencySubstitutionRules = true
-        extendsFrom(configurations.runtimeClasspath)
-        //canBeConsumed = false
-        canBeResolved = true
-        //canBeDeclared = false
-        //attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
-      }
-  }
 
   if (shouldPublish) {
     apply plugin: 'maven-publish'
@@ -350,6 +337,23 @@ subprojects {
     tasks.register('install').configure { dependsOn(publishToMavenLocal) }
     tasks.register('uploadArchives').configure { dependsOn(publish) }
   }
+
+    def  submodulesToIncludeInDistribution = ['core', 'tools', 'trogdor', 'shell', 'api', 'runtime', 'transforms',
+                                              'json', 'file', 'basic-auth-extension', 'mirror', 'mirror-client',
+                                              'streams', 'streams-scala', 'test-utils', 'examples', 'tools-api']
+
+    def shouldModuleResolveRuntimeClasspath = (submodulesToIncludeInDistribution.contains(project.name))
+
+    if (shouldModuleResolveRuntimeClasspath) {
+        configurations.create('publishedRuntimeClasspath') {
+            //resolutionStrategy.useGlobalDependencySubstitutionRules = true
+            extendsFrom(configurations.runtimeClasspath)
+            //canBeConsumed = false
+            canBeResolved = true
+            //canBeDeclared = false
+            //attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+        }
+    }
 
   // apply the eclipse plugin only to subprojects that hold code. 'connect' is just a folder.
   if (!project.name.equals('connect')) {
