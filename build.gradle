@@ -327,7 +327,8 @@ subprojects {
   def shouldPublishWithShadow = (['clients'].contains(project.name))
 
 
-  def shouldModuleResolveRuntimeClasspath = (['tools:tools-api'].contains(project.name))
+  def shouldModuleResolveRuntimeClasspath = (['streams-scala'].contains(project.name))
+
   if (shouldModuleResolveRuntimeClasspath) {
     configurations.create('publishedRuntimeClasspath') {
         //resolutionStrategy.useGlobalDependencySubstitutionRules = true
@@ -2399,6 +2400,11 @@ project(':tools:tools-api') {
     testRuntimeOnly runtimeTestLibs
   }
 
+  task returnProjectName {
+     println project.name
+
+  }
+
   task createVersionFile() {
     def receiptFile = file("${layout.buildDirectory.get().asFile.path}/kafka/$buildVersionFileName")
     inputs.property "commitId", commitId
@@ -3959,8 +3965,8 @@ project('zdistribution') {
         // wholeProjectDist project(path: ':streams:streams-scala', configuration: 'archives')
         // wholeProjectDist project(path: ':streams:test-utils', configuration: 'archives')
         // wholeProjectDist project(path: ':streams:examples', configuration: 'archives')
-        wholeProjectDist project(path: ':tools:tools-api', configuration: 'archives')
-        wholeProjectDist project(path: ':tools:tools-api', configuration: 'publishedRuntimeClasspath')
+        //wholeProjectDist project(path: ':tools:tools-api', configuration: 'archives')
+        wholeProjectDist project(path: ':streams:streams-scala', configuration: 'publishedRuntimeClasspath')
 
         
     }
