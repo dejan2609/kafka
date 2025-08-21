@@ -2405,20 +2405,8 @@ project(':tools:tools-api') {
     }
   }
 
-
-    tasks.create(name: "copyDependantLibs", type: Copy) {
-        from (configurations.runtimeClasspath) {
-            exclude('kafka-clients*')
-        }
-        into "${layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}"
-        duplicatesStrategy 'exclude'
-    }
-
   jar {
-      dependsOn {
-          createVersionFile
-          copyDependantLibs
-      }
+    dependsOn createVersionFile
     from("${layout.buildDirectory.get().asFile.path}") {
       include "kafka/$buildVersionFileName"
     }
