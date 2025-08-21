@@ -3951,26 +3951,39 @@ project('zdistribution') {
     dependencies {
         wholeProjectDist project(path: ':core', configuration: 'releaseOnly')
         wholeProjectDist project(path: ':core', configuration: 'archives')
-        wholeProjectDist project(path: ':core', configuration: 'runtimeClasspath') //publishedRuntimeClasspath
-        // wholeProjectDist project(path: ':tools', configuration: 'archives')
-        // wholeProjectDist project(path: ':trogdor', configuration: 'archives')
-        // wholeProjectDist project(path: ':shell', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:api', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:runtime', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:transforms', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:json', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:file', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:basic-auth-extension', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:mirror', configuration: 'archives')
-        // wholeProjectDist project(path: ':connect:mirror-client', configuration: 'archives')
-        // wholeProjectDist project(path: ':streams', configuration: 'archives')
-        // wholeProjectDist project(path: ':streams:streams-scala', configuration: 'archives')
-        // wholeProjectDist project(path: ':streams:test-utils', configuration: 'archives')
-        // wholeProjectDist project(path: ':streams:examples', configuration: 'archives')
-        //wholeProjectDist project(path: ':tools:tools-api', configuration: 'archives')
-        //wholeProjectDist project(path: ':streams:streams-scala', configuration: 'publishedRuntimeClasspath')
-
-        
+        wholeProjectDist project(path: ':core', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':tools', configuration: 'archives')
+        wholeProjectDist project(path: ':tools', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':trogdor', configuration: 'archives')
+        wholeProjectDist project(path: ':trogdor', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':shell', configuration: 'archives')
+        wholeProjectDist project(path: ':shell', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:api', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:api', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:runtime', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:runtime', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:transforms', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:transforms', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:json', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:json', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:file', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:file', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:basic-auth-extension', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:basic-auth-extension', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:mirror', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:mirror', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':connect:mirror-client', configuration: 'archives')
+        wholeProjectDist project(path: ':connect:mirror-client', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':streams', configuration: 'archives')
+        wholeProjectDist project(path: ':streams', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':streams:streams-scala', configuration: 'archives')
+        wholeProjectDist project(path: ':streams:streams-scala', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':streams:test-utils', configuration: 'archives')
+        wholeProjectDist project(path: ':streams:test-utils', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':streams:examples', configuration: 'archives')
+        wholeProjectDist project(path: ':streams:examples', configuration: 'publishedRuntimeClasspath')
+        wholeProjectDist project(path: ':tools:tools-api', configuration: 'archives')
+        wholeProjectDist project(path: ':tools:tools-api', configuration: 'publishedRuntimeClasspath')     
     }
 
     distributions {
@@ -4019,5 +4032,8 @@ project('zdistribution') {
       project(':core').configurations.archives.artifacts
       // ??? project.configurations.archives.artifacts  
       }
+      
+    siteDocDistTar.dependsOn(project(':core')siteDocsTar)
+
     // // distTar.dependsOn(project(':core').configurations.archives.artifacts ?
 }
