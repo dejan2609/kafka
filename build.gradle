@@ -3952,7 +3952,7 @@ project('zdistribution') {
 
     distributions {
         main {
-            distributionBaseName = distributionBaseName = "kafka_${versions.baseScala}-${project.version}"
+            distributionBaseName = "kafka_${versions.baseScala}-${project.version}"
             contents {
                 from(project.file("$rootDir/bin")) { into "bin/" }
                 from(project.file("$rootDir/config")) { into "config/" }
@@ -3965,8 +3965,8 @@ project('zdistribution') {
                 from("${project(':core').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
                 from("${project(':tools').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
                 from("${project(':trogdor').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
-                from("${project(':shell').layout.buildDirectory.get().asFile.path}/dependant-libs") { into("libs/") }
-                from("${project(':connect:api').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':shell').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
+                from("${project(':connect:api').layout.buildDirectory.get().asFile.path}/dependant-libs") { into("libs/") }
                 from("${project(':connect:runtime').layout.buildDirectory.get().asFile.path}/dependant-libs") { into("libs/") }
                 from("${project(':connect:transforms').layout.buildDirectory.get().asFile.path}/dependant-libs") { into("libs/") }
                 from("${project(':connect:json').layout.buildDirectory.get().asFile.path}/dependant-libs") { into("libs/") }
@@ -3980,6 +3980,13 @@ project('zdistribution') {
                 from("${project(':streams:examples').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
                 from("${project(':tools:tools-api').layout.buildDirectory.get().asFile.path}/dependant-libs-${versions.scala}") { into("libs/") }
             }
+        }
+        custom {
+            distributionBaseName = "kafka_${versions.baseScala}-${project.version}-site-doc"
+            contents {
+                from(project(':core').siteDocsTar) { into("site-docs/") }
+            }
+
         }
     }
 
