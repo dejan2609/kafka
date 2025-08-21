@@ -2387,11 +2387,11 @@ project(':tools:tools-api') {
   }
 
     configurations.create('publishedRuntimeClasspath') {
-        resolutionStrategy.useGlobalDependencySubstitutionRules = false
+        //resolutionStrategy.useGlobalDependencySubstitutionRules = true
         extendsFrom(configurations.runtimeClasspath)
-        canBeConsumed = false
-        canBeResolved = false
-        canBeDeclared = false
+        //canBeConsumed = false
+        canBeResolved = true
+        //canBeDeclared = false
         //attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
     }
 
