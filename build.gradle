@@ -2386,6 +2386,15 @@ project(':tools:tools-api') {
     testRuntimeOnly runtimeTestLibs
   }
 
+    configurations.create('publishedRuntimeClasspath') {
+        resolutionStrategy.useGlobalDependencySubstitutionRules = false
+        extendsFrom(configurations.runtimeClasspath)
+        canBeConsumed = false
+        canBeResolved = false
+        canBeDeclared = false
+        //attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+    }
+
   task createVersionFile() {
     def receiptFile = file("${layout.buildDirectory.get().asFile.path}/kafka/$buildVersionFileName")
     inputs.property "commitId", commitId
