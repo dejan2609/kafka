@@ -61,7 +61,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           persist-credentials:
             false
@@ -95,7 +95,7 @@ jobs:
         if: ${{ steps.download-build-scan.outcome == 'success' }}
         run: |
           set +e
-          ./gradlew --stacktrace buildScanPublishPrevious > gradle.out
+          ./gradlew --info buildScanPublishPrevious > gradle.out
           exitcode="$?"
           if [ $exitcode -ne 0 ]; then
             cat gradle.out
