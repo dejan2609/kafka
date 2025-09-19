@@ -128,5 +128,6 @@ include 'clients',
     'test-common:test-common-runtime'
 
 project(":storage:api").name = "storage-api"
+project(":distribution").projectDir.mkdirs()
 rootProject.name = 'kafka'
 
