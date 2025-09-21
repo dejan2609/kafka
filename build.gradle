@@ -3867,40 +3867,23 @@ project(':distribution') {
 
   dependencies {
     includeIntoDistribution project(path: ':core', configuration: 'releaseOnly')
-    includeIntoDistribution project(path: ':core', configuration: 'archives')
     includeIntoDistribution project(path: ':core', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':tools', configuration: 'archives')
     includeIntoDistribution project(path: ':tools', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':trogdor', configuration: 'archives')
     includeIntoDistribution project(path: ':trogdor', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':shell', configuration: 'archives')
     includeIntoDistribution project(path: ':shell', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:api', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:api', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:runtime', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:runtime', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:transforms', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:transforms', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:json', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:json', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:file', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:file', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:basic-auth-extension', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:basic-auth-extension', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:mirror', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:mirror', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':connect:mirror-client', configuration: 'archives')
     includeIntoDistribution project(path: ':connect:mirror-client', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':streams', configuration: 'archives')
     includeIntoDistribution project(path: ':streams', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':streams:streams-scala', configuration: 'archives')
     includeIntoDistribution project(path: ':streams:streams-scala', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':streams:test-utils', configuration: 'archives')
     includeIntoDistribution project(path: ':streams:test-utils', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':streams:examples', configuration: 'archives')
     includeIntoDistribution project(path: ':streams:examples', configuration: 'resolvedRuntimeClasspath')
-    includeIntoDistribution project(path: ':tools:tools-api', configuration: 'archives')
-    includeIntoDistribution project(path: ':tools:tools-api', configuration: 'resolvedRuntimeClasspath')     
+    includeIntoDistribution project(path: ':tools:tools-api', configuration: 'resolvedRuntimeClasspath')
   }
 
   task siteDocsTar(dependsOn: [':core:genProtocolErrorDocs', ':core:genProtocolTypesDocs', ':core:genProtocolApiKeyDocs', ':core:genProtocolMessageDocs',
@@ -3933,6 +3916,23 @@ project(':distribution') {
     from "$rootDir/NOTICE-binary" rename {String filename -> filename.replace("-binary", "")}
     from(project.siteDocsTar) { into("site-docs/") }
     from(configurations.includeIntoDistribution) { into("libs/") }
+    from(project(':core').configurations.archives.artifacts.files) { into("libs/") }
+    from(project(':tools').jar) { into("libs/") }
+    from(project(':trogdor').jar) { into("libs/") }
+    from(project(':shell').jar) { into("libs/") }
+    from(project(':connect:api').jar) { into("libs/") }
+    from(project(':connect:runtime').jar) { into("libs/") }
+    from(project(':connect:transforms').jar) { into("libs/") }
+    from(project(':connect:json').jar) { into("libs/") }
+    from(project(':connect:file').jar) { into("libs/") }
+    from(project(':connect:basic-auth-extension').jar) { into("libs/") }
+    from(project(':connect:mirror').jar) { into("libs/") }
+    from(project(':connect:mirror-client').jar) { into("libs/") }
+    from(project(':streams').jar) { into("libs/") }
+    from(project(':streams:streams-scala').jar) { into("libs/") }
+    from(project(':streams:test-utils').jar) { into("libs/") }
+    from(project(':streams:examples').jar) { into("libs/") }
+    from(project(':tools:tools-api').jar) { into("libs/") }
     destinationDirectory = project(':core').layout.buildDirectory.dir('distributions')
     duplicatesStrategy 'exclude'
     preserveFileTimestamps = true
