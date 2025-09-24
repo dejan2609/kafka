@@ -288,7 +288,7 @@ jobs:
       - name: Download Thread Dumps
         uses: actions/download-artifact@v4
         with:
-          pattern: junit-thread-dumps-25-ea-*
+          pattern: junit-thread-dumps-25-*
           path: thread-dumps
           merge-multiple: true
       - name: Check For Thread Dump
@@ -302,7 +302,7 @@ jobs:
       - name: Download JUnit XMLs
         uses: actions/download-artifact@v4
         with:
-          pattern: junit-xml-25-ea-*  # Only look at JDK 25 tests for the test catalog
+          pattern: junit-xml-25-*  # Only look at JDK 25 tests for the test catalog
           path: junit-xml
           merge-multiple: true
       - name: Collate Test Catalog
