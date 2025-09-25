@@ -3901,6 +3901,7 @@ project(':distribution') {
     compression = Compression.GZIP
     from project.file("$rootDir/docs")
     into 'site-docs'
+    // destination for distribution(s) is set to `:core` module in order to preserve paths used by CI server scripts
     destinationDirectory = project(':core').layout.buildDirectory.dir('distributions')
     duplicatesStrategy 'exclude'
     preserveFileTimestamps = true
@@ -3933,6 +3934,7 @@ project(':distribution') {
     from(project(':streams:test-utils').jar) { into("libs/") }
     from(project(':streams:examples').jar) { into("libs/") }
     from(project(':tools:tools-api').jar) { into("libs/") }
+    // destination for distribution(s) is set to `:core` module in order to preserve paths used by CI server scripts
     destinationDirectory = project(':core').layout.buildDirectory.dir('distributions')
     duplicatesStrategy 'exclude'
     preserveFileTimestamps = true
