@@ -126,7 +126,7 @@ versions += [
   snappy: "1.1.10.7",
   spotbugs: "4.9.4",
   mockOAuth2Server: "2.2.1",
-  zinc: "1.10.8",
+  zinc: "1.11.0",
   // When updating the zstd version, please do as well in docker/native/native-image-configs/resource-config.json
   // Also make sure the compression levels in org.apache.kafka.common.record.CompressionType are still valid
   zstd: "1.5.6-10",
