@@ -903,8 +903,8 @@ kafkaPublicApiChecker {
   }
 
   // Ignore core since its a scala project
-  if (it.path != ':core') {
-    if (userEnableTestCoverage) {
+  //if (it.path != ':core') {
+    //if (userEnableTestCoverage) {
       apply plugin: "jacoco"
 
       jacoco {
@@ -921,8 +921,8 @@ kafkaPublicApiChecker {
         }
       }
 
-    }
-  }
+    //}
+  //}
 
   if (userEnableTestCoverage) {
     def coverageGen = it.path == ':core' ? 'reportTestScoverage' : 'jacocoTestReport'
