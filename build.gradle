@@ -34,7 +34,7 @@ plugins {
   id 'idea'
   id 'jacoco'
   id 'java-library'
-  id 'org.owasp.dependencycheck' version '12.2.2'
+  id 'org.owasp.dependencycheck' version '13.0.0'
   id 'org.nosphere.apache.rat' version "0.8.1"
   id "io.swagger.core.v3.swagger-gradle-plugin" version "${swaggerVersion}"
 
