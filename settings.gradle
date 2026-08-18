@@ -34,9 +34,11 @@ def runFlaky = ext.find("kafka.test.run.flaky") == "true"
 def currentJvm = JavaVersion.current()
 
 develocity {
-    server = "https://develocity.apache.org"
+    //server = "https://develocity.apache.org"
     projectId = "kafka"
     buildScan {
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+        termsOfUseAgree = "yes"
         uploadInBackground = !isGithubActions
         publishing.onlyIf { it.authenticated }
         obfuscation {
