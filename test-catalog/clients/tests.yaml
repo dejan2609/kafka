@@ -182,6 +182,9 @@ org.apache.kafka.clients.admin.EndpointTypeTest:
 - testRoundTripController
 - testUnknown
 org.apache.kafka.clients.admin.GroupListingTest:
+- testNullGroupStateConstructor
+- testNullProtocolConstructor
+- testNullTypeConstructor
 - testSimpleConsumerGroup
 org.apache.kafka.clients.admin.KafkaAdminClientConfigTest:
 - testAlterClientQuotas
@@ -1362,6 +1365,8 @@ org.apache.kafka.clients.consumer.internals.CommitRequestManagerTest:
 - testEnsureCommitSensorRecordsMetric
 - testFetchOffsetsWithTopicIdsDoesNotFailOnUnsubscribedTopics
 - testLastEpochSentOnCommit
+- testMaximumTimeToWaitDoesNotSpinDuringRealBootstrapDnsResolution
+- testMaximumTimeToWaitWhenCoordinatorUnknownDoesNotSpin
 - testOffsetCommitAsyncFailedWithRetriableThrowsRetriableCommitException
 - testOffsetCommitRequestErroredRequestsNotRetriedForAsyncCommit
 - testOffsetCommitSingleFailedAttemptPerRequestWhenPartitionErrors
@@ -1411,8 +1416,12 @@ org.apache.kafka.clients.consumer.internals.ConsumerHeartbeatRequestManagerTest:
 - testHeartbeatResponseOnErrorHandling
 - testHeartbeatState
 - testLogsHeartbeatIntervalReceivedFromCoordinatorOnlyWhenChanged
+- testMaximumTimeToWaitDoesNotSpinDuringRealBootstrapDnsResolution
 - testMaximumTimeToWaitWhenCoordinatorUnavailableDoesNotSpin
+- testMaximumTimeToWaitWhenFatalReturnsMaxValue
+- testMaximumTimeToWaitWhenFencedWaitsRetryBackoff
 - testMaximumTimeToWaitWhenHeartbeatShouldBeSkipped
+- testMaximumTimeToWaitWhenJoiningAndCoordinatorUnknownDoesNotSpin
 - testNetworkTimeout
 - testNoCoordinator
 - testPollOnCloseGeneratesRequestIfNeeded
@@ -2497,7 +2506,9 @@ org.apache.kafka.clients.consumer.internals.ShareHeartbeatRequestManagerTest:
 - testHeartbeatResponseOnErrorHandling
 - testHeartbeatState
 - testLogsHeartbeatIntervalReceivedFromCoordinatorOnlyWhenChanged
+- testMaximumTimeToWaitWhenFatalReturnsMaxValue
 - testMaximumTimeToWaitWhenHeartbeatShouldBeSkippedDoesNotSpin
+- testMaximumTimeToWaitWhenJoiningAndCoordinatorUnknownDoesNotSpin
 - testNetworkTimeout
 - testNoCoordinator
 - testPollTimerExpiration
@@ -2613,6 +2624,7 @@ org.apache.kafka.clients.consumer.internals.StreamsGroupHeartbeatRequestManagerT
 - testLogsReceivedGroupConfigWhenAnyValueChanges
 - testMaximumTimeToWaitPollTimerExpired
 - testMaximumTimeToWaitSelectingMinimumWaitTime
+- testMaximumTimeToWaitWhenCoordinatorUnknownDoesNotSpin
 - testMaximumTimeToWaitWhenHeartbeatShouldBeNotSentImmediately
 - testMaximumTimeToWaitWhenHeartbeatShouldBeSentImmediately
 - testMissingClientTagsStatusLogsWarningOnlyOnce
@@ -3382,6 +3394,7 @@ org.apache.kafka.clients.producer.internals.SenderTest:
 - testEpochBumpOnOutOfOrderSequenceForNextBatch
 - testEpochBumpOnOutOfOrderSequenceForNextBatchWhenBatchInFlightFails
 - testEpochBumpOnOutOfOrderSequenceForNextBatchWhenThereIsNoBatchInFlight
+- testEpochBumpWhenOutOfOrderBatchesRetriedAndFirstBatchExpires
 - testExpiredBatchDoesNotRetry
 - testExpiredBatchDoesNotSplitOnMessageTooLargeError
 - testExpiredBatchesInMultiplePartitions
@@ -3971,6 +3984,7 @@ org.apache.kafka.common.message.ApiMessageTypeTest:
 - testFromApiKey
 - testHeaderVersion
 - testHeaderVersionWithNoValidVersion
+- testHeaderVersionsMatchSchemaFlexibility
 - testInvalidFromApiKey
 - testUniqueness
 org.apache.kafka.common.message.MessageTest:
@@ -4528,6 +4542,7 @@ org.apache.kafka.common.record.internal.FileLogInputStreamTest:
 org.apache.kafka.common.record.internal.FileRecordsTest:
 - testAppendProtectsFromOverflow
 - testBytesLengthOfWriteTo
+- testCloseFlushesAfterTrim
 - testConversion
 - testFileSize
 - testIterationDoesntChangePosition
@@ -4832,7 +4847,7 @@ org.apache.kafka.common.requests.RequestResponseTest:
 - testApiVersionsRequestBeforeV3Validation
 - testApiVersionsSerialization
 - testBatchedFindCoordinatorRequestSerialization
-- testClientThrottlesResponsesWithThrottleTime
+- testClientThrottleForCommonResponses
 - testCreateTopicRequestV0FailsIfValidateOnly
 - testCreateTopicRequestV3FailsIfNoPartitionsOrReplicas
 - testDeletableTopicResultErrorMessageIsNullByDefault
@@ -4848,6 +4863,8 @@ org.apache.kafka.common.requests.RequestResponseTest:
 - testInvalidSaslHandShakeRequest
 - testInvalidTaggedFieldsWithSaslAuthenticateRequest
 - testJoinGroupRequestV0RebalanceTimeout
+- testKip219BoundariesAreStillNeeded
+- testKip219BoundariesHaveThrottleTimeField
 - testListConfigResourcesRequestV0FailsWithConfigResourceTypeOtherThanClientMetrics
 - testListGroupRequestV3FailsWithStates
 - testProduceRequestPartitionSize
@@ -4869,7 +4886,10 @@ org.apache.kafka.common.requests.RequestResponseTest:
 org.apache.kafka.common.requests.RequestUtilsTest:
 - testIsFatalException
 org.apache.kafka.common.requests.StreamsGroupHeartbeatRequestTest:
+- testBuildClearsOwnedWarmupTasksForVersion0
 - testBuildClearsTaskOffsetsForVersion0
+- testBuildDoesNotReportOwnedWarmupTasksWhenAssignmentIsNotBeingReported
+- testBuildKeepsOwnedWarmupTasksForVersion1
 - testBuildKeepsTaskOffsetsForVersion1
 org.apache.kafka.common.requests.StreamsGroupHeartbeatResponseTest:
 - testAcceptableRecoveryLagFieldVersionCompatibility
@@ -5443,10 +5463,12 @@ org.apache.kafka.common.security.ssl.CommonNameLoggingSslEngineFactoryTest:
 - testPemKeyStoreConfigWithKeyPassword
 - testPemKeyStoreFileNoKeyPassword
 - testPemKeyStoreFileWithKeyPassword
+- testPemKeyStoreWithUnparseablePrivateKey
 - testPemTrustStoreConfigWithMultipleCerts
 - testPemTrustStoreConfigWithOneCert
 - testPemTrustStoreFile
 - testTrailingNewLines
+- testUnavailableKeyFactoryAlgorithmDoesNotThrow
 org.apache.kafka.common.security.ssl.CommonNameLoggingTrustManagerFactoryWrapperTest:
 - testCalcDigestForCertificateChain
 - testCommonNameLoggingTrustManagerFactoryWrapper
@@ -5466,10 +5488,12 @@ org.apache.kafka.common.security.ssl.DefaultSslEngineFactoryTest:
 - testPemKeyStoreConfigWithKeyPassword
 - testPemKeyStoreFileNoKeyPassword
 - testPemKeyStoreFileWithKeyPassword
+- testPemKeyStoreWithUnparseablePrivateKey
 - testPemTrustStoreConfigWithMultipleCerts
 - testPemTrustStoreConfigWithOneCert
 - testPemTrustStoreFile
 - testTrailingNewLines
+- testUnavailableKeyFactoryAlgorithmDoesNotThrow
 org.apache.kafka.common.security.ssl.SslPrincipalMapperTest:
 - testCommaWithWhitespace
 - testInvalidRules
@@ -5489,6 +5513,7 @@ org.apache.kafka.common.security.ssl.Tls12SslFactoryTest:
 - testPemCertificateEntriesValidation
 - testPemKeystoreVerifiableUsingTruststore
 - testPemReconfiguration
+- testPemReconfigurationWithInvalidKeyPreservesExistingFactory
 - testReconfiguration
 - testReconfigurationWithoutKeystore
 - testReconfigurationWithoutTruststore
@@ -5514,6 +5539,7 @@ org.apache.kafka.common.security.ssl.Tls13SslFactoryTest:
 - testPemCertificateEntriesValidation
 - testPemKeystoreVerifiableUsingTruststore
 - testPemReconfiguration
+- testPemReconfigurationWithInvalidKeyPreservesExistingFactory
 - testReconfiguration
 - testReconfigurationWithoutKeystore
 - testReconfigurationWithoutTruststore
@@ -5526,6 +5552,11 @@ org.apache.kafka.common.security.ssl.Tls13SslFactoryTest:
 - testSslFactoryWithoutProviderClassConfiguration
 - testUntrustedKeyStoreValidationFails
 - testUsedConfigs
+org.apache.kafka.common.security.token.delegation.TokenInformationTest:
+- testEqualInstancesCollapseInHashSet
+- testEqualsAndHashCode
+- testHashCodeIgnoresExpiryTimestampLikeEquals
+- testHashCodeIsStableAcrossRenewal
 org.apache.kafka.common.serialization.ListDeserializerTest:
 - shouldDeserializeListEndingInEmptyEntry
 - shouldPassHeadersToUnderlyingDeserializer
