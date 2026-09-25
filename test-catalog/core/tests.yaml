@@ -896,6 +896,7 @@ kafka.log.LogConfigTest:
 - testLocalLogRetentionDerivedDefaultProps
 - testLocalLogRetentionDerivedProps
 - testLocalLogRetentionProps
+- testMaxDecompressedMessageBytesProps
 - testOverriddenConfigsAsLoggableString
 - testToEnrichedRst
 - testToHtml
@@ -1109,16 +1110,6 @@ kafka.server.AlterUserScramCredentialsRequestTest:
 - testAlterUnknownMechanism
 - testDeleteSomethingThatDoesNotExist
 - testMetadataVersionTooLow
-kafka.server.ApiVersionsRequestTest:
-- testApiVersionsRequest
-- testApiVersionsRequestIncludesUnreleasedApis
-- testApiVersionsRequestMetadataClusterCheckFail
-- testApiVersionsRequestMetadataClusterCheckPass
-- testApiVersionsRequestThroughControllerListener
-- testApiVersionsRequestValidationV0
-- testApiVersionsRequestValidationV0ThroughControllerListener
-- testApiVersionsRequestValidationV3
-- testApiVersionsRequestWithUnsupportedVersion
 kafka.server.ApiVersionsResponseIntegrationTest:
 - testSendV3ApiVersionsRequest
 - testSendV4ApiVersionsRequest
@@ -1495,6 +1486,8 @@ kafka.server.IsrExpirationTest:
 - testIsrExpirationIfNoFetchRequestMade
 kafka.server.JoinGroupRequestTest:
 - testJoinGroupWithOldConsumerGroupProtocol
+kafka.server.JoinGroupRequestTest$WithTopologyDescriptionPluginEnabledTest:
+- testJoinGroupWithOldConsumerGroupProtocol
 kafka.server.KafkaApisTest:
 - requiredAclsNotPresentWriteTxnMarkersThrowsAuthorizationException
 - shouldAppendToLogOnWriteTxnMarkersWhenCorrectMagicVersion
@@ -1537,6 +1530,7 @@ kafka.server.KafkaApisTest:
 - testDescribeClusterRequest
 - testDescribeConfigsClientMetrics
 - testDescribeConfigsConsumerGroup
+- testDescribeConfigsTopicIncludesInternalConfigSetOnTopic
 - testDescribeConfigsWithAuthorizer
 - testDescribeProducers
 - testDescribeQuorumForwardedForKRaftClusters
@@ -2144,10 +2138,6 @@ kafka.server.RequestQuotaTest:
 - testShareFetchUsesSameFetchSensor
 - testUnauthorizedThrottle
 - testUnthrottledClient
-kafka.server.SaslApiVersionsRequestTest:
-- testApiVersionsRequestAfterSaslHandshakeRequest
-- testApiVersionsRequestBeforeSaslHandshakeRequest
-- testApiVersionsRequestWithUnsupportedVersion
 kafka.server.ServerMetricsTest:
 - testMetricsConfig
 kafka.server.ServerShutdownTest:
@@ -2232,6 +2222,25 @@ kafka.server.StreamsGroupHeartbeatRequestTest:
 - testStreamsGroupHeartbeatIsInaccessibleWhenOffsetTopicNotExist
 - testStreamsGroupHeartbeatWithInvalidAPIVersion
 kafka.server.StreamsGroupHeartbeatRequestTest$WithAssignmentBatchingDisabledTest:
+- testAlterRackAwareAssignmentTagsGroupConfig
+- testAlterStreamsAssignorNameGroupConfig
+- testAlterStreamsAssignorNameGroupConfigWithCustomAssignor
+- testDescribeStreamsAssignorNameGroupConfigFallsBackToAssignorName
+- testDynamicGroupConfig
+- testEmptyStreamsGroupId
+- testFencedMemberCanRejoinWithEpochZero
+- testGroupCoordinatorChange
+- testInternalTopicsCreation
+- testInvalidMemberEpoch
+- testMemberJoiningAndExpiring
+- testMemberLeaveHeartbeat
+- testStreamsGroupHeartbeatForMultipleMembers
+- testStreamsGroupHeartbeatIsAccessibleWhenNewGroupCoordinatorIsEnabledTopicNotExistFirst
+- testStreamsGroupHeartbeatIsInaccessibleWhenDisabledByFeatureConfig
+- testStreamsGroupHeartbeatIsInaccessibleWhenDisabledByStaticGroupCoordinatorProtocolConfig
+- testStreamsGroupHeartbeatIsInaccessibleWhenOffsetTopicNotExist
+- testStreamsGroupHeartbeatWithInvalidAPIVersion
+kafka.server.StreamsGroupHeartbeatRequestTest$WithTopologyDescriptionPluginEnabledTest:
 - testAlterRackAwareAssignmentTagsGroupConfig
 - testAlterStreamsAssignorNameGroupConfig
 - testAlterStreamsAssignorNameGroupConfigWithCustomAssignor
@@ -2424,6 +2433,7 @@ kafka.server.share.SharePartitionManagerTest:
 - testCachedTopicPartitionsForValidShareSessions
 - testCachedTopicPartitionsWithNoTopicPartitions
 - testCloseSharePartitionManager
+- testConcurrentInitialEpochRequestsClearsState
 - testCreateIdleShareFetchTask
 - testDelayedInitializationShouldCompleteFetchRequest
 - testFetchMessagesRotatePartitions
@@ -2596,6 +2606,8 @@ kafka.server.share.SharePartitionTest:
 - testCanAcquireRecordsWithCachedDataAndLimitNotReached
 - testCanAcquireRecordsWithCachedDataAndLimitReached
 - testCanAcquireRecordsWithEmptyCache
+- testCloseDeregistersMetrics
+- testCloseWhileActiveStillDeregistersMetrics
 - testComputeStartOffsetAdvanceResultWhenGapAtBeginning
 - testContainsAbortMarker
 - testDeliveryCompleteCountOnLockExpiryAndWriteFailureOnBatchLastDelivery

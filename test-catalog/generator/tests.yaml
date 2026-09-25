@@ -7,7 +7,11 @@ org.apache.kafka.message.EntityTypeTest:
 - testVerifyTypeMatches
 - testVerifyTypeMismatches
 org.apache.kafka.message.HeaderVersionsTest:
-- testAbsentProperty
+- testAbsentPropertyAllowedOnHeaderType
+- testAbsentPropertyAllowedWithNoValidVersions
+- testAbsentPropertyRejectedByDirectConstructor
+- testAbsentPropertyRejectedForRequest
+- testAbsentPropertyRejectedForResponse
 - testApiVersionsRequestFollowsFlexibilityRule
 - testApiVersionsResponseHeaderVersionZeroAcceptedForFlexibleVersions
 - testApiVersionsResponseMustUseHeaderVersionZero
@@ -24,13 +28,16 @@ org.apache.kafka.message.HeaderVersionsTest:
 - testGap
 - testHeaderVersionThreeAcceptedWhenHeaderSchemaAllowsIt
 - testHighestExistingHeaderVersionsAccepted
+- testJacksonRoundTripPreservesMap
 - testLastRangeNotOpenEnded
+- testMatchingFlexibilityMappingAccepted
 - testMissingHeaderSchemaRejected
 - testNegativeValue
 - testNegativeVersionRangeKey
 - testNoHeaderVersionsIsNoOpWithoutHeaderSchemas
-- testNonFlexibleHeaderSchemaWithFlexibleBodyRejected
-- testNonFlexibleVersionsAreNotChecked
+- testNonFlexibleHeaderSchemaWithFlexibleVersionRejected
+- testNonFlexibleRequestVersionNeedsNonFlexibleHeader
+- testNonFlexibleResponseVersionNeedsNonFlexibleHeader
 - testNoneKey
 - testNullValue
 - testOpenEndedRangeNotLast
@@ -38,6 +45,7 @@ org.apache.kafka.message.HeaderVersionsTest:
 - testPropertyIgnoredWithNoValidVersions
 - testPropertyOnDataType
 - testRangeBeyondValidVersions
+- testRequestHeaderVersionBelowLowestRejected
 - testRequestHeaderVersionMustExist
 - testResponseHeaderVersionMustExist
 - testReversedRangeKey
@@ -55,6 +63,8 @@ org.apache.kafka.message.IsNullConditionalTest:
 - testNotNullCheck
 - testNullCheck
 org.apache.kafka.message.MessageDataGeneratorTest:
+- testArrayLengthIsCapped
+- testArrayPreallocationIsCapped
 - testDuplicateTags
 - testInvalidFieldName
 - testInvalidFlexibleVersionsRange
@@ -70,23 +80,24 @@ org.apache.kafka.message.MessageDataGeneratorTest:
 - testInvalidTaggedVersionsWithoutTag
 - testNullDefaults
 - testNullDefaultsWithDeprecatedVersions
+- testTaggedFieldCountIsBounded
 org.apache.kafka.message.MessageGeneratorTest:
 - stripSuffixTest
 - testCapitalizeFirst
 - testConstants
 - testFirstIsCapitalized
 - testGenerateAndWriteMessageClasses
-- testHeaderVersionExplicitApiVersionsResponse
+- testHeaderVersionApiVersionsResponseKeepsKip511Comment
 - testHeaderVersionExplicitSingleRange
 - testHeaderVersionExplicitTwoRangeChain
-- testHeaderVersionFallbackApiVersionsResponse
-- testHeaderVersionFallbackFlexibleDerived
-- testHeaderVersionMixedExplicitAndFallback
+- testHeaderVersionNoValidVersionsGetsNoCase
 - testHeaderVersionRetiredVersionsGetNoBranch
 - testHeaderVersionRetiredVersionsKeepBranchInsideValidRange
+- testHeaderVersionThreeRangeChain
 - testLowerCaseFirst
 - testProcessDirectoriesChecksHeaderVersions
 - testProcessDirectoriesRejectsMissingHeaderSchema
+- testProcessDirectoriesRejectsMissingHeaderVersions
 - testProcessDirectoriesRejectsNonExistentHeaderVersion
 - testToSnakeCase
 org.apache.kafka.message.StructRegistryTest:

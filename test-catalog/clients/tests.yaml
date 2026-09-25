@@ -1408,6 +1408,7 @@ org.apache.kafka.clients.consumer.internals.ConsumerHeartbeatRequestManagerTest:
 - testGroupIdNotFoundExceptionWhileUnsubscribed
 - testGroupIdNotFoundWhileStableIsFatal
 - testHeartBeatRequestStateToStringBase
+- testHeartbeatMetrics
 - testHeartbeatNotSentIfAnotherOneInFlight
 - testHeartbeatOnStartup
 - testHeartbeatOutsideInterval
@@ -2377,6 +2378,7 @@ org.apache.kafka.clients.consumer.internals.ShareConsumeRequestManagerTest:
 - testCorruptMessageError
 - testDoesNotCloseSessionWhileAcknowledgementsPending
 - testDoesNotCloseSessionWhileRecordsBuffered
+- testEmptyResponseThenDataResponseBeforeCollectClearsInflightRecords
 - testFatalErrorsAcknowledgementResponse
 - testFetchDisconnected
 - testFetchError
@@ -2411,6 +2413,7 @@ org.apache.kafka.clients.consumer.internals.ShareConsumeRequestManagerTest:
 - testRetryAcknowledgementsMultipleCommitAsync
 - testRetryAcknowledgementsMultipleCommitSync
 - testRetryAcknowledgementsWithLeaderChange
+- testSecondFetchBeforeCollectClearsInflightRecords
 - testServerDisconnectedOnShareAcknowledge
 - testSessionHandlerRemovedAndPiggybackAcksFailedWhenNodeDisappears
 - testShareAcknowledgeInvalidResponse
@@ -2479,13 +2482,17 @@ org.apache.kafka.clients.consumer.internals.ShareFetchBufferTest:
 - testRetainsEvictedFetchWithPendingRenewAcknowledgements
 - testWakeup
 org.apache.kafka.clients.consumer.internals.ShareFetchCollectorTest:
+- testEmptyFetchFollowedByDataFetchForSamePartitionDoesNotLeak
 - testErrorInInitialize
+- testErrorInInitializeDoesNotLoseRecordsFromEarlierPartitions
 - testFetchNormal
 - testFetchWithCorruptMessage
 - testFetchWithOtherErrors
 - testFetchWithTopicAuthorizationFailed
 - testFetchWithUnknownLeaderEpoch
 - testFetchWithUnknownServerError
+- testRepeatedFetchesForSamePartitionDoesNotAccumulateRetainedFetches
+- testSecondFetchForSamePartitionMergesWithoutLeaking
 - testWithRenew
 org.apache.kafka.clients.consumer.internals.ShareFetchMetricsManagerTest:
 - testAcknowledgements
@@ -2494,8 +2501,20 @@ org.apache.kafka.clients.consumer.internals.ShareFetchMetricsManagerTest:
 - testLatency
 - testNodeLatency
 - testRecordsFetched
+org.apache.kafka.clients.consumer.internals.ShareFetchTest:
+- testAcquisitionLockTimeoutTakenFromLatestBatch
+- testEmptyFetch
+- testRecordsCombinesMultipleBatchesForPartition
+- testRecordsEmptyAfterAllAcknowledged
+- testRecordsGroupedByPartition
+- testRecordsIncludesPartitionWithGapsAndRecordsInSeparateBatches
+- testRecordsIsUnmodifiable
+- testRecordsOmitsPartitionWithOnlyGaps
+- testRecordsOnlyIncludesUnacknowledgedRecords
 org.apache.kafka.clients.consumer.internals.ShareHeartbeatRequestManagerTest:
+- testDisconnect
 - testFailureOnFatalException
+- testFencedMemberStopHeartbeatUntilItReleasesAssignmentToRejoin
 - testFirstHeartbeatIncludesRequiredInfoToJoinGroupAndGetAssignments
 - testGroupIdNotFoundExceptionWhileUnsubscribed
 - testGroupIdNotFoundWhileStableIsFatal
@@ -2503,11 +2522,15 @@ org.apache.kafka.clients.consumer.internals.ShareHeartbeatRequestManagerTest:
 - testHeartbeatNotSentIfAnotherOneInFlight
 - testHeartbeatOnStartup
 - testHeartbeatOutsideInterval
+- testHeartbeatRequestFailureNotifiedToGroupManagerAfterErrorPropagated
+- testHeartbeatResponseErrorNotifiedToGroupManagerAfterErrorPropagated
 - testHeartbeatResponseOnErrorHandling
 - testHeartbeatState
 - testLogsHeartbeatIntervalReceivedFromCoordinatorOnlyWhenChanged
+- testMaximumTimeToWaitWhenCoordinatorUnavailableDoesNotSpin
 - testMaximumTimeToWaitWhenFatalReturnsMaxValue
-- testMaximumTimeToWaitWhenHeartbeatShouldBeSkippedDoesNotSpin
+- testMaximumTimeToWaitWhenFencedWaitsRetryBackoff
+- testMaximumTimeToWaitWhenHeartbeatShouldBeSkipped
 - testMaximumTimeToWaitWhenJoiningAndCoordinatorUnknownDoesNotSpin
 - testNetworkTimeout
 - testNoCoordinator
@@ -2518,6 +2541,7 @@ org.apache.kafka.clients.consumer.internals.ShareHeartbeatRequestManagerTest:
 - testTimerNotDue
 - testUnsupportedVersionGeneratedOnTheBroker
 - testUnsupportedVersionGeneratedOnTheClient
+- testisExpiredByUsedForLogging
 org.apache.kafka.clients.consumer.internals.ShareMembershipManagerTest:
 - testDelayedMetadataUsedToCompleteAssignment
 - testFatalFailureWhenMemberAlreadyLeft
@@ -4019,6 +4043,8 @@ org.apache.kafka.common.message.MessageTest:
 - testProduceResponseVersions
 - testSimpleMessage
 - testSyncGroupDefaultGroupInstanceId
+- testTaggedFieldCountRejectedWhenExceedingHardCap
+- testTaggedFieldCountRejectedWhenLargerThanRemainingBytes
 - testThrottleTimeIgnorableInDescribeGroupsResponse
 - testTxnOffsetCommitRequestVersions
 - testTxnOffsetCommitResponseVersions
@@ -4043,6 +4069,10 @@ org.apache.kafka.common.message.RecordsSerdeTest:
 org.apache.kafka.common.message.SimpleArraysMessageTest:
 - testArrayBoundsChecking
 - testArrayBoundsCheckingOtherArray
+- testArrayLengthAboveMaxIsRejected
+- testDeclaredLengthAboveInitialCapacityStillParses
+- testKeyedArrayLengthAboveMaxIsRejected
+- testKeyedDeclaredLengthAboveInitialCapacityStillParses
 org.apache.kafka.common.message.SimpleExampleMessageTest:
 - shouldDefaultField
 - shouldImplementEqualsAndHashCode
@@ -4414,9 +4444,11 @@ org.apache.kafka.common.protocol.types.ProtocolSerializationTest:
 - testDefault
 - testNullableDefault
 - testNulls
+- testReadArrayLengthAboveMaxIsRejected
 - testReadArraySizeTooLarge
 - testReadBytesBeyondItsSize
 - testReadBytesSizeTooLarge
+- testReadCompactArrayLengthAboveMaxIsRejected
 - testReadCompactArraySizeTooLarge
 - testReadIgnoringExtraDataAtTheEnd
 - testReadNegativeArraySize
@@ -4446,6 +4478,8 @@ org.apache.kafka.common.protocol.types.TypeTest:
 - testNullRecordsSerde
 - testRecordsSerde
 org.apache.kafka.common.record.internal.AbstractLegacyRecordBatchTest:
+- testCompressedDeepDecodeEnforcesConfiguredMaxRecordBodySize
+- testCompressedDeepDecodeRejectsForgedInnerSizeExceedingArrayLengthLimit
 - testInvalidWrapperOffsetV1
 - testIterateCompressedRecordWithWrapperOffsetZero
 - testSetCreateTimeNotAllowedV0
@@ -4482,6 +4516,7 @@ org.apache.kafka.common.record.internal.DefaultRecordBatchTest:
 - buildDefaultRecordBatchWithProducerId
 - buildDefaultRecordBatchWithSequenceWrapAround
 - testBufferReuseInSkipKeyValueIterator
+- testCompressedIteratorsEnforceConfiguredMaxRecordBodySize
 - testDecrementSequence
 - testIncrementSequence
 - testInvalidCrc
@@ -4490,6 +4525,7 @@ org.apache.kafka.common.record.internal.DefaultRecordBatchTest:
 - testInvalidRecordCountTooManyCompressedV2
 - testInvalidRecordCountTooManyNonCompressedV2
 - testInvalidRecordSize
+- testOffsetOfMaxTimestampEnforcesConfiguredMaxRecordBodySize
 - testReadAndWriteControlBatch
 - testSetLastOffset
 - testSetLogAppendTime
@@ -4498,6 +4534,7 @@ org.apache.kafka.common.record.internal.DefaultRecordBatchTest:
 - testSizeInBytes
 - testSkipKeyValueIteratorCorrectness
 - testStreamingIteratorConsistency
+- testStreamingIteratorRejectsForgedBodySizeExceedingArrayLengthLimit
 - testWriteEmptyHeader
 - testZstdJniForSkipKeyValueIterator
 org.apache.kafka.common.record.internal.DefaultRecordTest:
@@ -4518,6 +4555,11 @@ org.apache.kafka.common.record.internal.DefaultRecordTest:
 - testInvalidVarlong
 - testNullHeaderKey
 - testNullHeaderKeyPartial
+- testReadFromStreamRejectsBodySizeExceedingConfiguredMax
+- testReadFromStreamRejectsInvalidBodySize
+- testReadFromStreamWithConfiguredMaxAcceptsValidRecordAndRejectsWhenTooSmall
+- testReadPartiallyFromStreamRejectsBodySizeExceedingConfiguredMax
+- testReadPartiallyFromStreamRejectsInvalidBodySize
 - testSerdeNoSequence
 - testUnderflowReadingTimestamp
 - testUnderflowReadingVarlong
@@ -4542,7 +4584,6 @@ org.apache.kafka.common.record.internal.FileLogInputStreamTest:
 org.apache.kafka.common.record.internal.FileRecordsTest:
 - testAppendProtectsFromOverflow
 - testBytesLengthOfWriteTo
-- testCloseFlushesAfterTrim
 - testConversion
 - testFileSize
 - testIterationDoesntChangePosition
@@ -4563,6 +4604,7 @@ org.apache.kafka.common.record.internal.FileRecordsTest:
 - testSearchForOffsetFromPosition6
 - testSearchForOffsetFromPosition7
 - testSearchForTimestamp
+- testSearchForTimestampRejectsCompressedRecordExceedingMaxRecordBodySize
 - testSliceForAlreadySlicedFileRecords
 - testSliceSizeLimitWithConcurrentWrite
 - testTruncate
@@ -4827,10 +4869,14 @@ org.apache.kafka.common.requests.RequestContextTest:
 - testInvalidRequestForArrayList
 - testInvalidRequestForByteArray
 - testInvalidRequestForImplicitHashCollection
+- testInvalidRequestForImplicitHashCollectionWithMaxPreAllocation
+- testKeyedCollectionAboveInitialCapacityStillParses
+- testProduceRequestV3WithHugeDeclaredTopicCountIsRejected
 - testSerdeUnsupportedApiVersionRequest
 org.apache.kafka.common.requests.RequestHeaderTest:
 - parseHeaderFromBufferWithNonZeroPosition
 - parseHeaderWithNullClientId
+- testHugeDeclaredTaggedFieldCountIsRejected
 - testRequestHeaderV1
 - testRequestHeaderV2
 - verifySizeMethodsReturnSameValue
@@ -6001,3 +6047,6 @@ org.apache.kafka.server.authorizer.internals.CidrUtilsTest:
 - testValidateValidIpv6Cidr
 org.apache.kafka.server.policy.AlterConfigPolicyTest:
 - testRequestMetadataEquals
+org.apache.kafka.test.faultproxy.KafkaProtocolFaultProxyTest:
+- shouldAcceptSingleBrokerBootstrap
+- shouldRejectMultiBrokerBootstrap

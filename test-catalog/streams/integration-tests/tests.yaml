@@ -44,6 +44,12 @@ org.apache.kafka.streams.integration.EosIntegrationTest:
 - shouldNotViolateEosIfOneTaskFailsWithState
 - shouldNotViolateEosIfOneTaskGetsFencedUsingIsolatedAppInstances
 - shouldWriteLatestOffsetsToCheckpointOnShutdown
+org.apache.kafka.streams.integration.FaultProxyDelayIntegrationTest:
+- shouldDelayASingleProduceResponse
+org.apache.kafka.streams.integration.FaultProxyExampleIntegrationTest:
+- shouldStayExactlyOnceWhenCommitIsFencedOnce
+org.apache.kafka.streams.integration.FaultProxyPlainClientsExampleIntegrationTest:
+- producerRetriesAroundInjectedProduceErrorAndConsumerReadsAll
 org.apache.kafka.streams.integration.FineGrainedAutoResetIntegrationTest:
 - shouldFailForResetNone
 - shouldOnlyReadRecordsWhereEarliestSpecifiedWithInvalidCommittedOffsets
@@ -423,6 +429,8 @@ org.apache.kafka.streams.integration.SmokeTestDriverIntegrationTest:
 - shouldWorkWithRebalance
 org.apache.kafka.streams.integration.SmokeTestDriverIntegrationTest$WithAssignmentBatchingDisabledTest:
 - shouldWorkWithRebalance
+org.apache.kafka.streams.integration.SourceTopicChangelogRestoreIntegrationTest:
+- shouldFullyRestoreSourceTopicChangelogStoreAfterTaskCorruptionWithStandbyReplica
 org.apache.kafka.streams.integration.StandbyTaskCreationIntegrationTest:
 - shouldCreateStandByTasksForMaterializedAndOptimizedSourceTables
 - shouldNotCreateAnyStandByTasksForStateStoreWithLoggingDisabled
@@ -540,6 +548,8 @@ org.apache.kafka.streams.integration.TimestampedWindowStoreWithHeadersTest:
 - shouldSetChangelogTopicProperties
 org.apache.kafka.streams.integration.TopologyDescriptionNoPluginIntegrationTest:
 - shouldRunStreamsApplicationAgainstBrokerWithoutTopologyDescriptionPlugin
+org.apache.kafka.streams.integration.TopologyDescriptionPluginAbsentExpirationIntegrationTest:
+- shouldTombstoneExpiredGroupWhenNoPluginIsConfigured
 org.apache.kafka.streams.integration.TopologyDescriptionPluginExpirationIntegrationTest:
 - shouldDeleteStoredTopologyDescriptionWhenGroupExpires
 - shouldReclaimUncertainPluginStateWhenPushPermanentlyFailed
