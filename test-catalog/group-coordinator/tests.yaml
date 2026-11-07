@@ -626,6 +626,7 @@ org.apache.kafka.coordinator.group.GroupMetadataManagerTest:
 - testOnLoadedSchedulesClassicGroupMemberHeartbeats
 - testOnLoadedSessionTimeoutExpiration
 - testOnLoadedSessionTimeoutExpirationForShareMember
+- testOnLoadedUsesClassicMemberSessionTimeout
 - testOnLoadedWithShareGroup
 - testOnLoadedWithStreamsGroup
 - testOnMetadataUpdate
@@ -810,7 +811,9 @@ org.apache.kafka.coordinator.group.GroupMetadataManagerTest:
 - testStreamsGroupDynamicConfigs
 - testStreamsGroupEndpointInformationIncludesNewMember
 - testStreamsGroupEndpointInformationOnlyWhenEpochGreater
+- testStreamsGroupEpochDoesNotIncreaseWhenEveryAssignmentConfigIsAtItsDefault
 - testStreamsGroupEpochIncreaseWithNumStandbyReplicasConfigChanges
+- testStreamsGroupEpochIncreasesWhenAnAssignmentConfigIsNotAtItsDefault
 - testStreamsGroupEpochShouldNotIncreaseWithAcceptableRecoveryLagConfigChange
 - testStreamsGroupEvaluatedConfigs
 - testStreamsGroupFallsBackToTargetAssignmentWhenRefinementLosesAnActiveTask
@@ -821,6 +824,9 @@ org.apache.kafka.coordinator.group.GroupMetadataManagerTest:
 - testStreamsGroupHeartbeatPartialResponseWhenNothingChanges
 - testStreamsGroupHeartbeatRefinementStepBumpsEpochWithoutRunningAssignor
 - testStreamsGroupHeartbeatRejectsDuplicateTaskOffsets
+- testStreamsGroupHeartbeatResendsAssignmentAfterEpochBumpResponseLoss
+- testStreamsGroupHeartbeatResendsAssignmentAfterSameEpochResponseLoss
+- testStreamsGroupHeartbeatResendsRevocationAfterResponseLoss
 - testStreamsGroupHeartbeatResponseVersion0
 - testStreamsGroupHeartbeatResponseVersion1
 - testStreamsGroupHeartbeatStoresTaskOffsetsWithoutPersisting
@@ -829,6 +835,8 @@ org.apache.kafka.coordinator.group.GroupMetadataManagerTest:
 - testStreamsGroupKeepsNoRefinedAssignmentWhenWarmupsAreDisabled
 - testStreamsGroupMemberCanRejoinWithEpochZero
 - testStreamsGroupMemberEpochValidation
+- testStreamsGroupMemberJoiningWithDifferentTopologyAndHigherEpoch
+- testStreamsGroupMemberJoiningWithDifferentTopologyAndSameEpoch
 - testStreamsGroupMemberJoiningWithIncorrectlyPartitionedTopic
 - testStreamsGroupMemberJoiningWithMissingInternalTopic
 - testStreamsGroupMemberJoiningWithMissingSourceTopic
@@ -838,6 +846,7 @@ org.apache.kafka.coordinator.group.GroupMetadataManagerTest:
 - testStreamsGroupMetadataReplayRoundTripsTopologyDescriptionEpochs
 - testStreamsGroupReconcilesTowardsTheRefinedAssignment
 - testStreamsGroupRefinerIsPassedTheGroupContextAndTheGroupsConfigs
+- testStreamsGroupRefinerIsPassedTheHeartbeatVersionsOfTheMembers
 - testStreamsGroupStagesAMigrationBehindAWarmupTask
 - testStreamsGroupStopsStagingOnceTheWarmupTaskIsCaughtUp
 - testStreamsGroupUsesBrokerDefaultAssignorWhenGroupUnset
@@ -1131,11 +1140,42 @@ org.apache.kafka.coordinator.group.assignor.SimpleAssignorTest:
 - testAssignWithTwoMembersAndTwoTopicsHomogeneous
 - testAssignWithTwoMembersAndTwoTopicsHomogeneousWithAllowedMap
 - testAssignWithTwoMembersAndTwoTopicsHomogeneousWithNonAssignableTopic
+- testAssignWithUnsubscribedTopicHeterogeneous
+- testAssignWithUnsubscribedTopicHomogeneous
 - testIncrementalAssignmentDecreasingMembersHeterogeneous
 - testIncrementalAssignmentDecreasingMembersHomogeneous
 - testIncrementalAssignmentIncreasingMembersHeterogeneous
 - testIncrementalAssignmentIncreasingMembersHomogeneous
 - testName
+org.apache.kafka.coordinator.group.assignor.Uniform2AssignorTest:
+- testAGiverGivesSeveralExtraPartitionsInARow
+- testAWaitingGiverWakesUpWhenASubscriberOfItsTopicsGetsSmaller
+- testAddedPartitionsGoToTheMembersBelowTheirQuota
+- testAnExtraPartitionGoesToAnotherMemberWhenTheSmallestHaveOneOfTheTopic
+- testAssignmentReuse
+- testAssignmentWithThePropertiesDoesNotChange
+- testBalanceMovesExtraPartitionsKeptByTheirOwner
+- testBalanceMovesUntilNoExtraPartitionCanMove
+- testCohortWhoseMembersAllHaveAnExtraPartitionGetsNoMore
+- testCohortsWaitingForAnExtraPartitionOfOneTopicDoNotCarryOverToTheNext
+- testEmptyGroup
+- testFromARangeLikeAssignment
+- testFromATopicHeldByASingleMember
+- testFromAnArbitraryAssignment
+- testHeterogeneousBalancesAcrossTopics
+- testHomogeneousSpreadsEveryTopic
+- testJoinOnlyMovesThePartitionsOfTheJoiner
+- testLeaveOnlyMovesThePartitionsOfTheLeaver
+- testMemberChangingItsSubscriptionGivesUpTheTopicItLeaves
+- testMembersWithTheSameSubscriptionShareACohort
+- testMissingAndUnsubscribedTopicsAreIgnored
+- testName
+- testOrderIndependence
+- testReassignmentStickiness
+- testStalePartitionsAreDropped
+- testSubscriptionsAsTopicIdsWithAnUnknownTopic
+- testTheGiverGivesTheExtraPartitionOfATopicTheReceiverOwnsMoreThanTheMinimumQuotaOf
+- testTheSmallestMemberThatCannotTakeIsPassedOver
 org.apache.kafka.coordinator.group.assignor.UniformHeterogeneousAssignmentBuilderTest:
 - testAssignmentReuse
 - testFirstAssignmentNumMembersGreaterThanTotalNumPartitions
@@ -1163,11 +1203,85 @@ org.apache.kafka.coordinator.group.assignor.UniformHomogeneousAssignmentBuilderT
 - testReassignmentWhenOneSubscriptionRemovedAfterInitialAssignmentWithTwoMembersTwoTopics
 - testReassignmentWhenPartitionsAreAddedForTwoMembersTwoTopics
 - testValidityAndBalanceForLargeSampleSet
+org.apache.kafka.coordinator.group.assignor.uniform2.AssignmentBuilderTest:
+- testChangedMemberSharesTheSetsOfItsUnchangedTopics
+- testMemberLosingAllThePartitionsOfATopicHasNoEntryForIt
+- testNewSetsAreHashSetsWhenNotConsecutive
+- testNewSetsAreRangeSetsWhenConsecutive
+- testNothingCarriesOverFromOneTopicToTheNext
+- testStalePartitionsAreDroppedFromAMemberHoldingOnlyThem
+- testStalePartitionsAreDroppedFromAMemberWhoseTopicsDoNotChange
+- testUnchangedMemberKeepsItsMap
+org.apache.kafka.coordinator.group.assignor.uniform2.CurrentAssignmentTest:
+- testOwnersAndAssignments
+- testPartitionsOfATopicThatNoLongerExistsAreStale
+- testPartitionsOfATopicTheMemberDoesNotSubscribeToAreStale
+- testTopicNobodyOwnsHasNoOwners
+org.apache.kafka.coordinator.group.assignor.uniform2.IndexedGroupTest:
+- testCohortsWithTheSameHashAreComparedExactly
+- testEmptyGroup
+- testHeterogeneousGroup
+- testHomogeneousGroup
+- testMaxPartitionCount
+- testMembersAreNumberedInMemberIdOrder
+- testSecondBuildThrows
+- testSingleMember
+- testTopicsAreNumberedInTopicIdOrder
+- testTopicsThatAreNotSubscribedAreIgnored
+- testTopicsThatDoNotExistAreIgnored
+org.apache.kafka.coordinator.group.assignor.uniform2.PartitionPlacementTest:
+- testAMemberOwningItsMinQuotaGetsItsExtraPartition
+- testMovingPartitionsGoCohortByCohort
+- testMovingPartitionsGoToTheMembersBelowTheirQuotaInMemberOrder
+- testMovingPartitionsWithAMinQuotaOfZeroGoInTheOrderOfTheExtraPartitions
+- testMovingPartitionsWithAMinQuotaOfZeroGoOnlyToTheMembersWithAnExtraPartition
+- testNothingCarriesOverFromOneTopicToTheNext
+- testNothingMovesWhenEveryOwnerOwnsItsQuota
+- testOwnersKeepTheirLowestPartitionsUpToTheirQuota
+org.apache.kafka.coordinator.group.assignor.uniform2.QuotasTest:
+- testGiveExtraPartition
+- testMinQuotaAndExtraPartitions
+- testMoveExtraPartition
+org.apache.kafka.coordinator.group.assignor.uniform2.steps.AssignRemainingExtraPartitionsTest:
+- testACohortThatFillsUpGetsNoMore
+- testACohortWhoseMembersAllHaveAnExtraPartitionGetsNoMore
+- testAMemberWithMoreExtraPartitionsGetsOneWhenTheOthersHaveOneOfTheTopic
+- testExtraPartitionGoesToTheCohortWithTheSmallestAssignment
+- testMembersOfACohortAreServedInTurn
+- testMembersWithTheFewestExtraPartitionsAreServedFirst
+- testNothingLeftToAssign
+- testTiesGoToTheFirstCohort
+- testTopicsWithTheFewestSubscribersGoFirst
+org.apache.kafka.coordinator.group.assignor.uniform2.steps.BalanceExtraPartitionsTest:
+- testAGiverGivesSeveralExtraPartitionsInARowToTheSameReceiver
+- testAWaitingGiverWakesUpWhenASubscriberOfItsTopicsGetsSmaller
+- testBalanceMovesUntilNoExtraPartitionCanMove
+- testBothWaysOfCountingGiveTheSameQuotas
+- testCohortsSharingNoTopicAreBalancedOnTheirOwn
+- testCountsFitWhenTheyTakeNoMoreEntriesThanTheSubscriptions
+- testMayMoveWhenAssignmentSizesAreTwoApart
+- testMembersWhoseSizeChangedAreLookedAtWithTheirNewSize
+- testNothingMayMoveInAnEmptyGroup
+- testNothingMayMoveWhenAssignmentSizesAreWithinOne
+- testNothingMovesWhenNoExtraPartitionCanMove
+- testOnEqualSizesAGiverWithAFreeExtraPartitionGivesFirst
+- testOnEqualSizesAReceiverOwningMoreThanTheMinQuotaReceivesFirst
+- testReceiversOfEqualSizesGoInMemberOrder
+- testTheGiverGivesAFreeExtraPartitionBeforeAnOwnedOne
+- testTheGiverGivesAnExtraPartitionTheReceiverOwnsFirst
+- testTheLargestMemberGivesToTheSmallestWhateverItsCohort
+- testTheSmallestMemberWhichCannotTakeIsPassedOver
+- testWithinACohortTheLargestGivesToTheSmallest
+org.apache.kafka.coordinator.group.assignor.uniform2.steps.KeepStickyExtraPartitionsTest:
+- testOwnersAboveTheMinQuotaKeepAnExtraPartition
+- testOwnersOfTheSameSizeKeepInMemberOrder
+- testOwnersWithTheSmallestAssignmentKeepTheExtraPartitions
 org.apache.kafka.coordinator.group.assignor.uniform2.util.IntListTest:
 - testAdd
 - testClear
 - testGet
 - testIndexOf
+- testListsWithoutCapacityHoldTheirOwnElements
 - testNegativeCapacityThrows
 - testOf
 - testRemove
@@ -1180,6 +1294,11 @@ org.apache.kafka.coordinator.group.assignor.uniform2.util.IntListTest:
 - testToString
 - testTruncate
 - testTruncateOutOfRangeThrows
+org.apache.kafka.coordinator.group.assignor.uniform2.util.IntPairTest:
+- testHigh
+- testLow
+- testPack
+- testPairsOfNonNegativeIntsSortByHighThenLow
 org.apache.kafka.coordinator.group.assignor.uniform2.util.LongHeapTest:
 - testAgreesWithAPriorityQueue
 - testClear
@@ -1350,7 +1469,6 @@ org.apache.kafka.coordinator.group.modern.consumer.ConsumerGroupTest:
 - testSubscribedRegularExpressionCount
 - testSubscriptionType
 - testUpdateAndRemoveRegularExpression
-- testUpdateInvertedAssignment
 - testUpdateMember
 - testUpdateSubscribedTopicNamesAndSubscriptionType
 - testUpdatingMemberUpdatesPartitionEpoch
@@ -1412,6 +1530,7 @@ org.apache.kafka.coordinator.group.modern.share.ShareGroupConfigProviderTest:
 - testShareGroupDLQTopicWithoutGroupConfig
 org.apache.kafka.coordinator.group.modern.share.ShareGroupConfigTest:
 - testConfigs
+- testDlqManagerFetcherThreadCountDefaultsToTwo
 - testInvalidConfigs
 org.apache.kafka.coordinator.group.modern.share.ShareGroupMemberTest:
 - testAsShareGroupDescribeMember
@@ -1425,6 +1544,8 @@ org.apache.kafka.coordinator.group.modern.share.ShareGroupTest:
 - testGetOrCreateMember
 - testGroupState
 - testGroupTypeFromString
+- testInitMapValueWithAddedPartitions
+- testInitMapValueWithRemovedPartitions
 - testIsInStatesCaseInsensitive
 - testIsSubscribedToTopic
 - testMetadataRefreshDeadline
@@ -1432,7 +1553,6 @@ org.apache.kafka.coordinator.group.modern.share.ShareGroupTest:
 - testProtocolType
 - testRemoveMember
 - testType
-- testUpdateInvertedAssignment
 - testUpdateMember
 - testUpdateSubscribedTopicNamesAndSubscriptionType
 - testValidateDeleteGroup
@@ -1448,6 +1568,7 @@ org.apache.kafka.coordinator.group.streams.AssignmentRefinerTest:
 - shouldBorrowAStandbyOnTheTargetOwnerItselfInsteadOfSpendingASlot
 - shouldBreakAFullTieOnTheCanonicalTaskOrder
 - shouldBreakATieAmongCaughtUpCopiesOnTheMemberId
+- shouldCompleteAHandOverToAWarmTargetOwnerRatherThanPromoteAnUnobservableStandby
 - shouldCountAColdGrantThisStepMakesAsARestoreOnTheMemberReceivingIt
 - shouldCountStatefulTasksOfEveryRoleTowardsProcessLoad
 - shouldCountWarmupsFundedThisPassInTheSourceProcessLoad
@@ -1472,12 +1593,17 @@ org.apache.kafka.coordinator.group.streams.AssignmentRefinerTest:
 - shouldFundOnTheLoadThisStepsGrantsLeaveBehind
 - shouldFundTheMigrationRelievingTheBusierSourceWhenDestinationsTie
 - shouldFundTheMigrationWithTheLeastLoadedDestinationFirst
+- shouldGrantATaskAtOnceToATargetOwnerThatCannotBeWarmedUp
+- shouldGrantATaskAtOnceToATargetOwnerThatCannotBeWarmedUpAndAlreadyHoldsAStandby
 - shouldGrantATaskNobodyHoldsWhenItsTargetProcessReportsStateOnDisk
 - shouldGrantATaskNobodyHoldsWhenNoCopyOfItIsCaughtUp
 - shouldGrantATaskNobodyRunsEvenToAColdMember
 - shouldGrantATaskWhoseHolderIsStillRestoringItEvenToAColdMember
 - shouldGrantATaskWhoseHolderIsStillRestoringItRatherThanStageIt
 - shouldGrantATaskWhosePreviousOwnerWasAlreadyToldToRevokeIt
+- shouldGrantAnOrphanToATargetOwnerThatCannotBeWarmedUpEvenIfAStandbyHolderCannotReport
+- shouldGrantAnOrphanWhenTheTargetAssignmentDoesNotKeepTheStandbyOnItsHolder
+- shouldGrantAnOrphanWhoseStandbyHolderReportsItsProgressAndIsBehind
 - shouldGrantTheTaskWhenASiblingOnTheTargetProcessHoldsACaughtUpReplica
 - shouldGrantTheTaskWhenItMovesBetweenTwoMembersOfOneProcess
 - shouldGrantTheTaskWhenTheTargetOwnerAlreadyHoldsACaughtUpReplica
@@ -1492,22 +1618,25 @@ org.apache.kafka.coordinator.group.streams.AssignmentRefinerTest:
 - shouldIndexWhetherACopyHasStartedItsRestore
 - shouldKeepABorrowedStandbyWhereHistoryLeftIt
 - shouldKeepAStalledWarmupThatHasAlreadyRestoredSomething
+- shouldKeepATaskRunningOnACurrentOwnerThatCannotBeWarmedUp
 - shouldKeepFundingAWarmupThatIsAlreadyRestoring
 - shouldKeepTheActiveWithItsCurrentOwnerAndWithholdItFromTheTargetOwner
 - shouldMoveASiblingStandbyOntoTheTargetOwnerAndBackfillTheRelocatedOne
 - shouldNeverPlaceATaskTwiceOnOneProcess
+- shouldNotBeCaughtUpWhenAnOffsetSumOverflowed
 - shouldNotBeCaughtUpWhenAnotherTaskWasReported
 - shouldNotBeCaughtUpWhenNothingWasReported
 - shouldNotBeCaughtUpWhenOnlyTheEndOffsetWasReported
 - shouldNotBeCaughtUpWhenOnlyTheOffsetWasReported
 - shouldNotBeCaughtUpWhenTheLagExceedsTheAcceptableRecoveryLag
-- shouldNotBeCaughtUpWhenTheRestoreHasNotStarted
+- shouldNotBeCaughtUpWhileTheEndOffsetIsNotKnown
 - shouldNotCountAFundedSiblingMoveTowardsItsTargetProcessLoad
 - shouldNotCountAGrantThatPromotesACopyTheProcessAlreadyHolds
 - shouldNotCountAWarmGrantTowardsTheDestinationProcessLoad
 - shouldNotCountStatelessTasksTowardsProcessLoad
 - shouldNotCountTasksPendingRevocationTowardsProcessLoad
 - shouldNotDetectADropAndADuplicateCancellingEachOtherOut
+- shouldNotDetourThroughACaughtUpCopyWhenTheTargetOwnerCannotBeWarmedUp
 - shouldNotFundAMigrationWhoseTargetMemberHasLeftTheGroup
 - shouldNotFundAWarmupWhoseTaskWasReTargetedToAnotherProcess
 - shouldNotIndexAnActiveHolderForATaskThatIsPendingRevocation
@@ -1517,6 +1646,9 @@ org.apache.kafka.coordinator.group.streams.AssignmentRefinerTest:
 - shouldNotPreserveActiveTaskCountWhenATaskWasDropped
 - shouldNotPreserveActiveTaskCountWhenATaskWasHandedToTwoMembers
 - shouldNotPreserveActiveTaskCountWhenATaskWasInvented
+- shouldNotPromoteAWarmupTaskOfUnknownLag
+- shouldNotPromoteAnUnobservableStandbyWhenTheTargetProcessHoldsACopy
+- shouldNotPromoteAnUnobservableStandbyWhileAMemberStillRestoresTheTaskAsActive
 - shouldNotStageStatelessTasks
 - shouldNotWithholdARelocatedStandbyTheMemberAlreadyHolds
 - shouldNotWithholdARelocatedStandbyTheProcessAlreadyHolds
@@ -1534,6 +1666,7 @@ org.apache.kafka.coordinator.group.streams.AssignmentRefinerTest:
 - shouldPreserveActiveTaskCountWhenTheTargetAssignmentItselfDuplicatesATask
 - shouldPreserveTheActiveTaskCountThroughEveryDerivation
 - shouldPreserveTheReplicaCountOfABorrowedMigration
+- shouldPromoteACaughtUpCopyAheadOfAStandbyOfUnknownLag
 - shouldPromoteACaughtUpCopyHolderOfATaskNobodyHoldsWhenItsTargetOwnerIsGone
 - shouldPromoteACopyHolderTheTargetAssignmentDoesNotNameAsAStandbyHolder
 - shouldPromoteTheCaughtUpCopyHolderOfATaskNobodyHolds
@@ -1542,6 +1675,9 @@ org.apache.kafka.coordinator.group.streams.AssignmentRefinerTest:
 - shouldReportAnInFlightWarmupOnTheTargetProcess
 - shouldReturnDecisionsInCanonicalTaskOrder
 - shouldReturnTheTargetAssignmentItselfWhenNothingDiverges
+- shouldRunAnOrphanOnTheStandbyHolderThatCannotReportItsProgress
+- shouldRunAnOrphanOnTheUnobservableStandbyHolderWhenTheTargetOwnerHasLeft
+- shouldRunAnOrphanOnTheUnobservableStandbyHolderWhileTheTargetOwnerWarmsUp
 - shouldSpendASlotMovingAStandbyOnASiblingOntoTheTargetOwner
 - shouldSpreadConcurrentPlantsAcrossProcessesRatherThanStackingThem
 - shouldStageAMigrationToAMemberThatHoldsNoState
@@ -1701,6 +1837,7 @@ org.apache.kafka.coordinator.group.streams.StreamsGroupTest:
 - testRelabelRefinedAssignmentOfUnknownMemberIsANoOp
 - testRemoveMember
 - testRemoveMemberClearsTaskOffsets
+- testRemoveMemberForgetsItsHeartbeatVersion
 - testRemoveMemberRemovesCacheEntry
 - testRemoveStaticMember
 - testRemoveTaskProcessIds
@@ -1711,6 +1848,7 @@ org.apache.kafka.coordinator.group.streams.StreamsGroupTest:
 - testShouldExpireTrueWhenStoredEpochIsDefault
 - testShutdownRequestedMethods
 - testTopologyDescriptionPluginEpochs
+- testUpdateAndRetrieveHeartbeatVersions
 - testUpdateAndRetrieveTaskOffsets
 - testUpdateMember
 - testUpdateMemberInvalidatesCache
@@ -1796,14 +1934,6 @@ org.apache.kafka.coordinator.group.streams.TasksTupleWithEpochsTest:
 - testReturnUnmodifiableTaskAssignments
 - testTasksCannotBeNull
 - testToString
-org.apache.kafka.coordinator.group.streams.TopicMetadataTest:
-- testConstructor
-- testConstructorWithEmptyName
-- testConstructorWithNegativeNumPartitions
-- testConstructorWithNullName
-- testConstructorWithNullUuid
-- testConstructorWithZeroNumPartitions
-- testConstructorWithZeroUuid
 org.apache.kafka.coordinator.group.streams.TopologyMetadataTest:
 - testIsStateful
 - testIsStatefulThrowsExceptionWhenSubtopologyIdDoesNotExist
@@ -1814,10 +1944,15 @@ org.apache.kafka.coordinator.group.streams.TopologyMetadataTest:
 - testTopology
 org.apache.kafka.coordinator.group.streams.assignor.AssignmentConfigsImplTest:
 - testDefault
-- testFromEmptyMap
-- testFromMap
-- testFromMapWithoutRackAwareAssignmentTags
+- testFromRecord
+- testFromRecordIgnoresUnknownConfigs
+- testFromRecordWithEmptyConfigs
+- testFromRecordWithoutConfigs
+- testFromRecordWithoutRackAwareAssignmentTags
 - testRackAwareAssignmentTagsAreUnmodifiable
+- testRecordRoundTrip
+- testToMap
+- testToMapWithoutRackAwareAssignmentTags
 - testWithers
 org.apache.kafka.coordinator.group.streams.assignor.BalancedTaskAssignorTest:
 - shouldAssignActiveStatefulTasksEvenlyOverMembersWhereNumberOfMembersIntegralDivisorOfNumberOfTasks
@@ -1842,6 +1977,7 @@ org.apache.kafka.coordinator.group.streams.assignor.BalancedTaskAssignorTest:
 - shouldNotDependOnPreviousAssignmentAcrossProcessesUnlikeStickyAssignor
 - shouldPlaceTasksAcrossProcessesIndependentlyOfWarmupTasksAndReportedOffsets
 - shouldProduceValidAndLevelledAssignmentsForRandomGroupsWithPreviousAssignments
+- shouldSpreadTasksOfEachSubtopologyInProportionToMemberCounts
 - shouldSpreadTasksOfEachSubtopologyOverProcesses
 - shouldThrowWhenThereAreTasksButNoMembers
 - testToStringReturnsName
@@ -1865,6 +2001,13 @@ org.apache.kafka.coordinator.group.streams.assignor.ProcessStateTest:
 - shouldReturnFalseWhenCapacityIsFull
 - shouldReturnTrueIfTaskIsAssigned
 - shouldReturnTrueWhenCapacityIsAvailable
+org.apache.kafka.coordinator.group.streams.assignor.RackAwareStandbyPickerTest:
+- shouldGiveUpPriorityKeyOnceEveryValueIsUsed
+- shouldKeepLaterTagKeyAfterGivingUpAnEarlierOne
+- shouldMatchAScanOverAllProcesses
+- shouldOnlyPickEligibleProcessesWithNewValueForPriorityKey
+- shouldRankProcessesByNewValuesForLowerPriorityKeys
+- shouldStartOverForNextTask
 org.apache.kafka.coordinator.group.streams.assignor.StickyTaskAssignorTest:
 - shouldAssignActiveAndStandbyTasks
 - shouldAssignAtLeastOneTaskToEachClientIfPossible

@@ -431,6 +431,7 @@ org.apache.kafka.streams.StreamsConfigTest:
 - testInvalidSocketReceiveBufferSize
 - testInvalidSocketSendBufferSize
 - testOsDefaultSocketBufferSizes
+- testValidateConfigPropertiesFile
 org.apache.kafka.streams.TopologyTest:
 - kGroupedStreamAnonymousMaterializedCountShouldPreserveTopologyStructure
 - kGroupedStreamAnonymousStoreTypedMaterializedCountShouldPreserveTopologyStructure
@@ -1692,6 +1693,7 @@ org.apache.kafka.streams.kstream.internals.foreignkeyjoin.SubscriptionSendProces
 - leftJoinShouldPropagateNewPrimaryKeyWithNullFK
 - leftJoinShouldPropagateNewRecordOfUnchangedFK
 - leftJoinShouldPropagateNothingWhenOldAndNewLeftValueIsNull
+- shouldUseTaskPartitionAsPrimaryPartitionWhenRecordMetadataIsUndefined
 org.apache.kafka.streams.kstream.internals.foreignkeyjoin.SubscriptionWrapperSerdeTest:
 - shouldPassHeadersToUnderlyingDeserializer
 - shouldPassHeadersToUnderlyingSerializer
@@ -1707,6 +1709,10 @@ org.apache.kafka.streams.kstream.internals.foreignkeyjoin.SubscriptionWrapperSer
 - shouldThrowExceptionOnNullKeyV1Test
 - shouldThrowExceptionOnNullPrimaryPartitionV1Test
 - shouldThrowExceptionOnUnsupportedVersionTest
+- shouldThrowOnDataShorterThanHeaderTest
+- shouldThrowOnTruncatedV1DataWithHashTest
+- shouldThrowOnTruncatedV1DataWithNullHashTest
+- shouldThrowOnUnsupportedVersionDuringDeserializationTest
 org.apache.kafka.streams.kstream.internals.graph.GraphGraceSearchUtilTest:
 - shouldExtractGraceFromKStreamSessionWindowAggregateNode
 - shouldExtractGraceFromKStreamWindowAggregateNode
@@ -2372,6 +2378,7 @@ org.apache.kafka.streams.processor.internals.ProcessorStateManagerTest:
 - shouldCommitAndCloseLegacyStores
 - shouldCommitAndCloseLegacyStoresWithUnknownOffsetPositions
 - shouldCommitGoodStoresEvenSomeThrowsException
+- shouldConvertNextFetchToLastAppliedOffsetWhenAdvancingRestoredOffset
 - shouldExcludeCorruptedStoresFromDowngradeCheckpoint
 - shouldFindSingleStoreForChangelog
 - shouldGetChangelogPartitionForRegisteredStore
@@ -2380,6 +2387,9 @@ org.apache.kafka.streams.processor.internals.ProcessorStateManagerTest:
 - shouldInitializeOffsetsFromCheckpointFileAndDeleteIfEOSEnabled
 - shouldLoadMissingFileAsEmptyPosition
 - shouldLogAWarningIfCheckpointThrowsAnIOException
+- shouldNoOpAdvanceRestoredOffsetWhenNextFetchIsZero
+- shouldNotAdvanceOffsetWhenAlreadyAtRestoreBoundary
+- shouldNotMoveRestoredOffsetBackwards
 - shouldNotRefreshTaskDirectoryModificationTimeWhenClosingStartupTask
 - shouldNotThrowTaskCorruptedExceptionAfterCheckpointing
 - shouldNotThrowTaskCorruptedWithoutCheckpointAndNonEmptyDirWhenTransactional
@@ -2499,6 +2509,7 @@ org.apache.kafka.streams.processor.internals.RecordCollectorTest:
 - shouldCallOldImplementationWithRecordContextExceptionHandler
 - shouldClearOffsetsOnCloseClean
 - shouldClearOffsetsOnCloseDirty
+- shouldClearOffsetsOnCloseDirtyIfAbortTransactionThrows
 - shouldDropAllRecords
 - shouldDropRecordExceptionUsingAlwaysContinueExceptionHandler
 - shouldFailWithDeadLetterQueueRecords
@@ -2779,6 +2790,20 @@ org.apache.kafka.streams.processor.internals.StateRestoreCallbackAdapterTest:
 - shouldPassRecordsThrough
 - shouldThrowOnRestore
 - shouldThrowOnRestoreAll
+org.apache.kafka.streams.processor.internals.StoreChangelogReaderCaughtUpOffsetTest:
+- shouldAccountForTrailingOffsetHolesBeforeAdvancingCaughtUpOffset
+- shouldAdvanceStandbySourceChangelogOffsetWhenPositionReachesRestoreEndOffset
+- shouldAdvertiseRestoreEndOffsetNotLivePositionWhenActiveCompletesPastEnd
+- shouldAdvertiseZeroAfterActiveRestoreOfEmptyChangelogWithZeroEndOffset
+- shouldKeepLastAppliedOffsetAfterNonEmptyActiveRestore
+- shouldNotAdvanceActiveOffsetOnEmptyPollWhileStillBehindEndOffset
+- shouldNotAdvanceActiveOffsetWhenPositionIsBehindRestoreEndOffset
+- shouldNotAdvanceStandbyOffsetOnEmptyPollWhileLagIsPositive
+- shouldNotAdvanceStandbyOffsetWhenPositionTimesOut
+- shouldNotAdvanceStandbySourceChangelogOffsetWhenPositionTimesOut
+- shouldNotAdvertiseBufferedSourceChangelogRecordsBeyondCommittedLimit
+- shouldReportZeroTaskLagAfterEmptyHighEndOffsetRestore
+- shouldResumeAtLogEndOffsetAfterCheckpointingEmptyHighEndOffsetRestore
 org.apache.kafka.streams.processor.internals.StoreChangelogReaderTest:
 - changelogEndOffsetsShouldFallBackToStoreMetadataWhenLogicalChangelogMetadataIsNull
 - logicalChangelogEndOffsetsShouldReturnNullWhenBothSourcesUnknown
@@ -2809,6 +2834,7 @@ org.apache.kafka.streams.processor.internals.StoreChangelogReaderTest:
 - shouldOnlyRestoreStandbyChangelogInUpdateStandbyState
 - shouldPassSuspendReasonToStandbyListener
 - shouldPollWithRightTimeout
+- shouldReportCaughtUpOffsetAfterRestoringEmptyChangelogWithHighEndOffset
 - shouldRequestCommittedOffsetsAndHandleTimeoutException
 - shouldRequestEndOffsetsAndHandleTimeoutException
 - shouldRequestPositionAndHandleTimeoutException
@@ -2876,12 +2902,14 @@ org.apache.kafka.streams.processor.internals.StreamTaskTest:
 - shouldInitTaskTimeoutAndEventuallyThrow
 - shouldLogNotReadyWhenStaleAfterThreshold
 - shouldMaybeReturnOffsetsForRepartitionTopicsForPurging
+- shouldNeedCommitWhenInitializationWritesUncommittedBytes
 - shouldNotAttemptToLockIfNoStores
 - shouldNotCheckpointOnPostCommitInRunningStateWithEosAndNotEnforced
 - shouldNotCommitAfterRestorationWhenExactlyOnceEnabled
 - shouldNotCommitOnCloseCreated
 - shouldNotCommitStaleNextOffsetForPartitionNotReReadAfterRevive
 - shouldNotGetOffsetsIfPrepareCommitDirty
+- shouldNotNeedCommitAfterRestorationWithoutUncommittedBytes
 - shouldNotProcessRecordsAfterPrepareCommitWhenEosV2Enabled
 - shouldNotPunctuateSystemTimeWhenIntervalNotElapsed
 - shouldNotShareHeadersBetweenPunctuateIterations
@@ -2989,6 +3017,7 @@ org.apache.kafka.streams.processor.internals.StreamThreadTest:
 - shouldNotEnforceRebalanceWhenTaskCorruptedExceptionIsThrownForAnInactiveTask
 - shouldNotOverrideShutdownOperationWhenThreadFailsAfterShutdownWasInitiated
 - shouldNotPopulateWireTopologyDescriptionWhenPushDisabled
+- shouldNotProcessOrPunctuateWhileUncommittedBytesExceedLimit
 - shouldNotProcessWhenPartitionRevoked
 - shouldNotPurgeBeforeThePurgeInterval
 - shouldNotRecordFailedStreamThread
@@ -2996,6 +3025,8 @@ org.apache.kafka.streams.processor.internals.StreamThreadTest:
 - shouldNotThrowWhenStandbyTasksAssignedAndNoStateStoresForTopology
 - shouldOnlyCompleteShutdownAfterRebalanceNotInProgress
 - shouldOnlyShutdownOnce
+- shouldPauseProcessingThreadsWhileUncommittedBytesExceedLimit
+- shouldPauseProcessingThreadsWhileUncommittedBytesExceedLimitAndStreamsGroupNotReady
 - shouldPopulateWireTopologyDescriptionWhenPushEnabled
 - shouldProcessWhenPartitionAssigned
 - shouldProcessWhenRunning
@@ -3013,6 +3044,7 @@ org.apache.kafka.streams.processor.internals.StreamThreadTest:
 - shouldRespectNumIterationsInMainLoopWithoutProcessingThreads
 - shouldRespectPollTimeInPartitionsAssignedStateWithStateUpdater
 - shouldResumePollingForPartitionsWithAvailableSpaceBeforePolling
+- shouldResumeProcessingOnceUncommittedBytesAreCommitted
 - shouldReturnActiveTaskMetadataWhileRunningState
 - shouldReturnErrorIfMainConsumerInstanceIdNotInitialized
 - shouldReturnErrorIfProducerInstanceIdNotInitialized
@@ -3308,6 +3340,7 @@ org.apache.kafka.streams.processor.internals.TaskManagerTest:
 - shouldFailOnCommitFatal
 - shouldFailStreamThreadIfStateUpdaterDied
 - shouldFirstHandleTasksInStateUpdaterThenSuspendedActiveTasksInTaskRegistry
+- shouldForwardProcessingThreadsPausedToSchedulingTaskManager
 - shouldHandleExceptionThrownDuringRecyclingActiveTask
 - shouldHandleExceptionThrownDuringRecyclingStandbyTask
 - shouldHandleRebalanceEvents
@@ -3340,6 +3373,7 @@ org.apache.kafka.streams.processor.internals.TaskManagerTest:
 - shouldNotComputeOffsetSumForRunningStatelessTask
 - shouldNotFailForTimeoutExceptionOnConsumerCommit
 - shouldNotFailOnTimeoutException
+- shouldNotForwardProcessingThreadsPausedWithoutProcessingThreads
 - shouldNotLockAnythingIfStateDirIsEmpty
 - shouldNotPauseReadyTasksOnRebalanceComplete
 - shouldNotPublishTaskOffsetSumSnapshotUnderClassicProtocol
@@ -3925,6 +3959,7 @@ org.apache.kafka.streams.processor.internals.tasks.DefaultTaskExecutorTest:
 - shouldShutdownTaskExecutor
 - shouldUnassignTaskWhenNotProgressing
 - shouldUnassignTaskWhenRequired
+- shouldUnassignTaskWhileProcessingPaused
 org.apache.kafka.streams.processor.internals.tasks.DefaultTaskManagerTest:
 - shouldAddTask
 - shouldAssignTaskThatCanBeProcessed
@@ -3935,6 +3970,7 @@ org.apache.kafka.streams.processor.internals.tasks.DefaultTaskManagerTest:
 - shouldLockAnEmptySetOfTasks
 - shouldNotAssignAnyLockedTask
 - shouldNotAssignLockedTask
+- shouldNotAssignTaskWhileProcessingPaused
 - shouldNotAssignTasksForProcessingIfProcessingDisabled
 - shouldNotAssignTasksForPunctuationIfPunctuationDisabled
 - shouldNotAssignTasksIfUncaughtExceptionPresent
@@ -3950,6 +3986,7 @@ org.apache.kafka.streams.processor.internals.tasks.DefaultTaskManagerTest:
 - shouldReturnFromAwaitOnSignalProcessableTasks
 - shouldReturnFromAwaitOnUnassignment
 - shouldReturnFromAwaitOnUnlocking
+- shouldReturnFromAwaitWhenProcessingResumed
 - shouldShutdownTaskExecutors
 - shouldStartTaskExecutors
 - shouldUnassignLockingTask
@@ -5347,7 +5384,6 @@ org.apache.kafka.streams.state.internals.MappingKeyValueIteratorAdapterTest:
 - shouldDelegatePeekNextKey
 - shouldPassThroughNullValue
 - shouldReturnNullWhenInnerReturnsNullEntry
-- timestampedToHeadersShouldConvertValueForSessionKeys
 - timestampedToHeadersShouldConvertValueOnNext
 - timestampedToHeadersWindowShouldConvertValueOnNext
 org.apache.kafka.streams.state.internals.MaybeTest:
@@ -5801,6 +5837,10 @@ org.apache.kafka.streams.state.internals.PlainToHeadersWindowStoreAdapterTest:
 - shouldHandleWindowRangeQuerySuccessfully
 - shouldNotCollectExecutionInfoWhenNotRequested
 - shouldReportRetentionPeriodOfUnderlyingStore
+org.apache.kafka.streams.state.internals.PositionSerdeTest:
+- shouldDeserializePositionWithTrailingBytes
+- shouldSerializeEmptyPositionToExactSize
+- shouldSerializeToExactSize
 org.apache.kafka.streams.state.internals.QueryableStoreProviderTest:
 - shouldFindGlobalStores
 - shouldResolveDefaultIsolationLevelAtQueryTime
@@ -6912,7 +6952,11 @@ org.apache.kafka.streams.state.internals.RocksDBTransactionBufferTest:
 - shouldNotLeakRolledBackWriteIntoLaterCommitOfDifferentKey
 - shouldNotShowStagedWritesInBaseAfterRollback
 - shouldReportIsEmpty
+- shouldReportNoUncommittedBytesAfterCommit
+- shouldReportNoUncommittedBytesAfterRollback
+- shouldReportNoUncommittedBytesWhenNothingStaged
 - shouldReportNotEmptyWithRangeTombstones
+- shouldReportUncommittedBytesForStagedRangeDelete
 - shouldReturnEmptyOptionalForStagedTombstone
 - shouldReturnNullForUnstagedKey
 - shouldReturnStagedValue

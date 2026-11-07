@@ -177,6 +177,9 @@ org.apache.kafka.server.ClientMetricsManagerTest:
 - testGetTelemetrySubscriptionAfterPushTelemetryUnknownCompressionSucceeds
 - testGetTelemetrySubscriptionAfterPushTelemetryUnknownSubscriptionSucceeds
 - testGetTelemetryUpdateSubscription
+- testGetTelemetryV0RejectsOneUuidClientInstanceId
+- testGetTelemetryV1RejectsReservedClientInstanceId
+- testGetTelemetryV1UsesClientInstanceIdFromRequestHeader
 - testGetTelemetryWithoutSubscription
 - testPushTelemetry
 - testPushTelemetryAfterPushIntervalTime
@@ -194,6 +197,8 @@ org.apache.kafka.server.ClientMetricsManagerTest:
 - testPushTelemetryTerminatingFlag
 - testPushTelemetryTerminatingFlagNotSetOnValidationFailure
 - testPushTelemetryThrottleError
+- testPushTelemetryV1RejectsReservedClientInstanceId
+- testPushTelemetryV1UsesClientInstanceIdFromRequestHeader
 - testRemoveConnection
 - testRemoveConnectionUnknownConnectionId
 - testUpdateSubscription
@@ -204,6 +209,7 @@ org.apache.kafka.server.ClientMetricsManagerTest:
 org.apache.kafka.server.CordonedLogDirsIntegrationTest:
 - testAlterPartitionWithCordonedLogDirs
 - testAlterReplicaWithCordonedLogDirs
+- testCordonRelativeLogDir
 - testCordonUncordonLogDirs
 - testCordonUnknownLogDirs
 - testDecommissionBroker
@@ -300,6 +306,8 @@ org.apache.kafka.server.ForwardingManagerTest:
 - testResponseCorrelationIdMismatch
 - testUnsupportedVersionFromNetworkClient
 - testUnsupportedVersions
+org.apache.kafka.server.InterBrokerOAuthIntegrationTest:
+- testReplicationWithBrokerLoginCallbackHandler
 org.apache.kafka.server.KRaftClusterTest:
 - testAbandonedFutureReplicaRecovered_mainReplicaInOfflineLogDir
 - testAbandonedFutureReplicaRecovered_mainReplicaInOnlineLogDir
@@ -423,6 +431,8 @@ org.apache.kafka.server.config.DelegationTokenManagerConfigsTest:
 - testOverride
 org.apache.kafka.server.config.DynamicBrokerConfigTest:
 - testBrokerConfigSynonyms
+- testDynamicClusterMirrorConfigReconfigurableConfigs
+- testDynamicClusterMirrorConfigValidation
 - testValidateConfigTypesResolvesConfigProviders
 org.apache.kafka.server.config.DynamicConfigTest:
 - testGroupIsRemovedWhenDynamicConfigsAreRemoved
@@ -483,6 +493,9 @@ org.apache.kafka.server.metrics.LinuxIoMetricsCollectorTest:
 - testUnableToReadNonexistentProcFile
 org.apache.kafka.server.metrics.NodeMetricsTest:
 - testMetricsExported
+org.apache.kafka.server.mirror.MirrorCoordinatorRecordSerdeIntegrationTest:
+- testRecordsSurviveBrokerRestart
+- testTombstonesSurviveBrokerRestart
 org.apache.kafka.server.partition.AlterPartitionManagerTest:
 - testAuthorizationFailed
 - testBasic
@@ -557,6 +570,9 @@ org.apache.kafka.server.quota.ControllerMutationQuotaManagerTest:
 - testPermissiveControllerMutationQuotaViolation
 - testStrictControllerMutationQuotaViolation
 - testThrottleTime
+org.apache.kafka.server.quota.QuotaFactoryTest:
+- testUserClientQuotaUpdaterConvertsEntityAndQuota
+- testUserClientQuotaUpdatersDispatchToManagers
 org.apache.kafka.server.quota.ReplicationQuotaManagerTest:
 - shouldExceedQuotaThenReturnBackBelowBoundAsTimePasses
 - shouldSupportWildcardThrottledReplicas
@@ -588,6 +604,12 @@ org.apache.kafka.server.requests.ProduceRequestTest:
 - testZSTDProduceRequest
 org.apache.kafka.server.share.CachedSharePartitionTest:
 - testCachedSharePartitionEqualsAndHashCode
+org.apache.kafka.server.share.dlq.DefaultShareGroupDLQManagerTest:
+- testFetchThreadsAreNamedDaemonThreads
+- testStopIsIdempotent
+- testStopRunsQueuedReadsAndDoesNotInterruptRunningOnes
+- testStopTerminatesFetchExecutor
+- testStopWaitsForReadsAlreadyRunning
 org.apache.kafka.server.share.dlq.ShareGroupDLQRecordFetcherTest:
 - combination
 - many
@@ -596,6 +618,7 @@ org.apache.kafka.server.share.dlq.ShareGroupDLQRecordFetcherTest:
 - testAsyncReadResumeCompletesEmptyWhenProcessingThrows
 - testAsyncReadResumeWithNoProgressCompletesEmpty
 - testAsyncReadResumesLoopWhenPending
+- testBatchesStartingBeyondEndOffsetAreNotLoaded
 - testCompressedBatchAfterUncompressedRespectsCombinedBudget
 - testCompressedBatchExceedingDecompressedBudgetSkippedButLaterBatchStillCollected
 - testCompressedBatchExceedingDecompressedBudgetSkipsBatch
@@ -605,6 +628,7 @@ org.apache.kafka.server.share.dlq.ShareGroupDLQRecordFetcherTest:
 - testFetchRecordsAcrossMultipleReads
 - testFetchStopsOnceEnoughContentCollectedWithoutScanningWholeRange
 - testHardStopPreventsFurtherReads
+- testLegacyBatchBaseOffsetIsNeverRead
 - testLegacyCompressedBatchExceedingCumulativeCapSkipsBatchButLaterBatchStillCollected
 - testMissingPartitionResultYieldsNoRecords
 - testMultipleBatchesInSingleReadStopAtBudgetBetweenBatches
@@ -617,6 +641,7 @@ org.apache.kafka.server.share.dlq.ShareGroupDLQRecordFetcherTest:
 - testSingleReadWithUncompressedMagicV2AndLegacyCompressedBatchesAllCollected
 - testSingleRecordWithFabricatedLengthRejectedWithoutLargeAllocation
 - testUncompressedBatchStopsMidBatchOnceBudgetReached
+- testWantedBatchAfterOutOfOrderBatchIsStillCollected
 org.apache.kafka.server.share.dlq.ShareGroupDLQStateManagerTest:
 - testCoalesceProduceRequestsDefersHandlersThatExceedPartitionBudget
 - testCoalesceProduceRequestsKeepsDifferentDlqTopicsSeparate
@@ -628,17 +653,22 @@ org.apache.kafka.server.share.dlq.ShareGroupDLQStateManagerTest:
 - testCompleteHandlerSafelyIsolatesOneHandlersUncaughtExceptionFromOthers
 - testConstructorRejectsNullCacheHelper
 - testConstructorRejectsNullClient
+- testConstructorRejectsNullFetchExecutor
 - testConstructorRejectsNullLogReader
 - testConstructorRejectsNullShareGroupMetrics
 - testConstructorRejectsNullTime
 - testConstructorRejectsNullTimer
 - testCreateTopicBuilderPinsCreateTimeAlongsideDlqEnableConfig
+- testDLQRecordCopyDisabledIgnoresReservedHeadersOnSourceRecords
 - testDLQRecordCopyDisabledSkipsFetch
 - testDLQRecordCopyEnabled
 - testDLQRecordCopyEnabledButInvalidConfigSkipsFetch
+- testDLQRecordCopyEnabledDropsReservedOriginalHeaderWhenCorrespondingDLQHeaderOmitted
 - testDLQRecordCopyEnabledFetchesOnceAcrossProduceRetries
+- testDLQRecordCopyEnabledOriginalHeader
 - testDLQRecordCopyEnabledWithErrorOnLogRead
 - testDLQRecordCopyEnabledWithMixedLocalAndRemoteFetch
+- testDLQRecordCopyEnabledWithMixedOriginalHeadersPerRecord
 - testDLQRecordCopyEnabledWithMultipleLogReaderIterations
 - testDLQRecordCopyEnabledWithPartialLogReaderRecords
 - testDLQRecordCopyEnabledWithRemoteFetch
@@ -675,7 +705,10 @@ org.apache.kafka.server.share.dlq.ShareGroupDLQStateManagerTest:
 - testDlqValidationFailureCompletesFutureSynchronously
 - testFetcherBudgetSplitsRoundEvenWhenSizeFloorWouldHaveRoomForMore
 - testMultipleAccumulatedHandlersInNodeRPCMap
+- testRecordIsProducedWithHeadersOnlyWhenFetchExecutorRejects
 - testResolveRoundSurvivesSynchronousExceptionFromMaybeFetchRecordData
+- testSourceRecordsAreNotReadWhenCopyIsDisabled
+- testSourceRecordsAreReadOnTheFetchExecutorNotTheCaller
 - testStartIsIdempotent
 - testStopWithoutStartIsNoOp
 org.apache.kafka.server.share.fetch.DelayedShareFetchKeyTest:
@@ -687,7 +720,7 @@ org.apache.kafka.server.share.fetch.PartitionMaxBytesStrategyTest:
 org.apache.kafka.server.share.fetch.PartitionRotateStrategyTest:
 - testRoundRobinStrategy
 - testRoundRobinStrategyWithEmptyPartitions
-- testRoundRobinStrategyWithSpecialSessionEpochs
+- testRoundRobinStrategyWithSinglePartition
 org.apache.kafka.server.share.fetch.RecordStateTest:
 - testRecordStateForId
 - testRecordStateValidateTransition
@@ -696,6 +729,7 @@ org.apache.kafka.server.share.fetch.ShareFetchTest:
 - testErrorInAllPartitions
 - testErrorInAllPartitionsWithMultipleTopicIdPartitions
 - testFilterErroneousTopicPartitions
+- testMaybeCompletePreservesPartitionOrder
 - testMaybeCompleteWithErroneousTopicPartitions
 - testMaybeCompleteWithException
 - testMaybeCompleteWithExceptionPartialFailure

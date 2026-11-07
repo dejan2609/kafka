@@ -785,6 +785,7 @@ org.apache.kafka.metadata.MetadataCacheTest:
 - testGetLeaderAndIsr
 - testGetLiveBrokerEpoch
 - testGetOfflineReplicasConsidersDirAssignment
+- testGetPartitionLeaderEndpointForKnownPartitionWithoutEndpoint
 - testGetPartitionReplicaEndpoints
 - testIsBrokerFenced
 - testIsBrokerInControlledShutdown
@@ -939,6 +940,12 @@ org.apache.kafka.metadata.placement.TopicAssignmentTest:
 - testConsistentEqualsAndHashCode
 - testToString
 - testTopicAssignmentReplicas
+org.apache.kafka.metadata.publisher.DynamicClientQuotaPublisherTest:
+- testInvalidIpAddressIsReportedToFaultHandler
+- testIpAddressIsNotResolvedWithoutConnectionRateChanges
+- testIpQuotaUpdateAndRemoval
+- testNoClientQuotaChanges
+- testUserClientQuotaUpdateAndRemoval
 org.apache.kafka.metadata.storage.FormatterTest:
 - testDirectories
 - testFeatureFlag
